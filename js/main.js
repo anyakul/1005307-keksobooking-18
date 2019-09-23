@@ -91,6 +91,19 @@ var getRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
 
+//функция создания элементов из массива со случайным выбором элементов
+var renderMassiveVl = function(array) {
+  var arrayNew = [];
+  var k = 0;
+  for (var j = 0; j < array.length; j++) {
+    if (getRandomNumber(0, 2)) {
+        arrayNew[k] = array[j];
+        k = k + 1;
+    }
+  }
+  return arrayNew;
+};
+
 // Функция генерации массива js объектов
 var generateMockData = function () {
   var mocks = [];
@@ -108,37 +121,23 @@ var generateMockData = function () {
         guests: getRandomNumber(guests.min, guests.max),
         checkin: checkin[getRandomNumber(0, checkin.length)],
         checkout: checkout[getRandomNumber(0, checkout.length)],
-        features: [],
+        features: renderMassiveVl(features),
         description: description[getRandomNumber(0, description.length)],
-        photos: [],
+        photos: renderMassiveVl(photos),
       },
 
       location: {
         x: coordX,
         y: coordY,
       }
+      
     };
-    var k = 0;
-    for (var j = 0; j < features.length; j++) {
-      if (getRandomNumber(0, 2)) {
-        mock.offer.features[k] = features[j];
-        k = k + 1;
-      }
-    }
-    k = 0;
-    for (var j = 0; j < photos.length; j++) {
-      if (getRandomNumber(0, 2)) {
-        mock.offer.photos[k] = photos[j];
-        k = k + 1;
-      }
-    }
     mocks.push(mock);
   }
-
   return mocks;
-};
+}
 
-console.log(generateMockData());
+ 
 
 // Функция для создания DOM-элементов, соответствующих меткам на карте
 var renderPin = function (mock) {
@@ -159,7 +158,7 @@ var pinsTemplate = document.querySelector('#pin')
     .querySelector('.map__pin');
 
 var mocks = generateMockData();
-
+console.log(mocks);
 var fragment = document.createDocumentFragment();
 
 for (var i = 0; i < mocks.length; i++) {
