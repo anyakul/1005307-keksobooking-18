@@ -1,23 +1,12 @@
 'use strict';
 
-var USERS = 8;
+var USER_COUNT = 8;
 
 var PinSize = {
   WIDTH: 70,
   HEIGHT: 50,
   RADIUS: 25,
 };
-
-var titles = [
-  'title1',
-  'title2',
-  'title3',
-  'title4',
-  'title5',
-  'title6',
-  'title7',
-  'title8'
-];
 
 var MapRect = {
   LEFT: 100,
@@ -31,13 +20,6 @@ var Price = {
   MAX: 1000
 };
 
-var types = [
-  'palace',
-  'flat',
-  'house',
-  'bungalo'
-];
-
 var Room = {
   MIN: 1,
   MAX: 5
@@ -47,6 +29,26 @@ var Guest = {
   MIN: 1,
   MAX: 10,
 };
+
+var description = 'description';
+
+var titles = [
+  'title1',
+  'title2',
+  'title3',
+  'title4',
+  'title5',
+  'title6',
+  'title7',
+  'title8'
+];
+
+var types = [
+  'palace',
+  'flat',
+  'house',
+  'bungalo'
+];
 
 var checkins = [
   '12.00',
@@ -69,8 +71,6 @@ var features = [
   'conditioner',
 ];
 
-var description = 'description';
-
 var photos = [
   'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
@@ -82,7 +82,7 @@ var mapPins = map.querySelector('.map__pins');
 var pinsTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
-var fragment = document.createDocumentFragment();
+
 
 // Функция получения рандомных чисел в определенном диапозоне
 var getRandomNumber = function (min, max) {
@@ -94,67 +94,73 @@ var getRandomArray = function (array) {
   return array.slice(0, getRandomNumber(0, array.length));
 };
 
-// Функция генерации массива js объектов
-var generateAdData = function () {
-  var ads = [];
-  for (var i = 1; i <= USERS; i++) {
-    var coordX = getRandomNumber(MapRect.LEFT, MapRect.RIGHT);
-    var coordY = getRandomNumber(MapRect.TOP, MapRect.BOTTOM);
-    var ad = {
-      avatar: 'img/avatars/user0' + i + '.png',
-      offer: {
-        title: titles[getRandomNumber(0, titles.length)],
-        address: coordX + ', ' + coordY,
-        price: getRandomNumber(Price.MIN, Price.MAX),
-        type: types[getRandomNumber(0, types.length)],
-        rooms: getRandomNumber(Room.MIN, Room.MAX),
-        guests: getRandomNumber(Guest.MIN, Guest.MAX),
-        checkin: checkins[getRandomNumber(0, checkins.length)],
-        checkout: checkouts[getRandomNumber(0, checkouts.length)],
-        features: getRandomArray(features),
-        description: description,
-        photos: getRandomArray(photos),
-      },
+// функция генерации строковых id
+var getAdIds = function (num) {
+  return Array(num).fill(null).map(function (_, index) {
+    index += 1;
+    return index < 10 ? '0' + index : String(index);
+  });
+};
 
-      location: {
-        x: coordX,
-        y: coordY,
-      }
+// функция создания одного элемента
+var makeAd = function (id) {
+  var location = {
+    x: getRandomNumber(MapRect.LEFT, MapRect.RIGHT),
+    y: getRandomNumber(MapRect.TOP, MapRect.BOTTOM),
+  };
 
-    };
-    ads.push(ad);
-  }
-  return ads;
+  return {
+    avatar: 'img/avatars/user' + id + '.png',
+    offer: {
+      title: titles[getRandomNumber(0, titles.length)],
+      address: location.x + ', ' + location.y,
+      price: getRandomNumber(Price.MIN, Price.MAX),
+      type: types[getRandomNumber(0, types.length)],
+      rooms: getRandomNumber(Room.MIN, Room.MAX),
+      guests: getRandomNumber(Guest.MIN, Guest.MAX),
+      checkin: checkins[getRandomNumber(0, checkins.length)],
+      checkout: checkouts[getRandomNumber(0, checkouts.length)],
+      features: getRandomArray(features),
+      description: description,
+      photos: getRandomArray(photos),
+    },
+    location: location,
+  };
+};
+
+// функция генерации объявлений
+var generateAds = function (num) {
+  return getAdIds(num).map(makeAd);
 };
 
 // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
 var renderPin = function (ad) {
-  var pinsElement = pinsTemplate.cloneNode(true);
-  var pinsElementImg = pinsElement.querySelector('img');
+  var pins = pinsTemplate.cloneNode(true);
+  var pinsImg = pins.querySelector('img');
 
-  pinsElementImg.src = ad.avatar;
-  pinsElement.style.left = (Math.floor(ad.location.x - PinSize.WIDTH / 2)) + 'px';
-  pinsElement.style.top = (Math.floor(ad.location.y)) + 'px';
+  pinsImg.src = ad.avatar;
+  pins.style.left = (ad.location.x - PinSize.RADIUS) + 'px';
+  pins.style.top = (ad.location.y - PinSize.HEIGHT) + 'px';
 
-  return pinsElement;
+  return pins;
 };
 
 // Функция внеcения изменений в DOM
-var addDomElement = function (ads) {
+var renderPins = function (ads) {
+  var fragment = document.createDocumentFragment();
   ads.forEach(function (ad) {
     fragment.appendChild(renderPin(ad));
   });
   mapPins.appendChild(fragment);
-  return;
 };
 
 // На основе данных, созданных в первом пункте, создаю DOM-элементы, соответствующие меткам на карте,
 // и заполняю их данными из массива.
 
-var mocks = generateAdData();
+var mocks = generateAds(USER_COUNT);
 
 // Делаю карту активной
 map.classList.remove('map--faded');
 
 // Отрисовываю сгенерированные DOM-элементы в блок .map__pins.
-addDomElement(mocks);
+renderPins(mocks);
