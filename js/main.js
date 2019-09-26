@@ -27,7 +27,7 @@ var Room = {
 
 var Guest = {
   MIN: 1,
-  MAX: 10,
+  MAX: 5,
 };
 
 var description = 'description';
@@ -83,6 +83,9 @@ var pinsTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
 
+var cardTemplate = document.querySelector('#card')
+    .content
+    .querySelector('.map__card');
 
 // Функция получения рандомных чисел в определенном диапозоне
 var getRandomNumber = function (min, max) {
@@ -91,7 +94,7 @@ var getRandomNumber = function (min, max) {
 
 // функция создания элементов из массива со случайным выбором элементов
 var getRandomArray = function (array) {
-  return array.slice(0, getRandomNumber(0, array.length));
+  return array.slice(0, getRandomNumber(0, array.length - 1));
 };
 
 // функция генерации строковых id
@@ -100,6 +103,32 @@ var getAdIds = function (num) {
     index += 1;
     return index < 10 ? '0' + index : String(index);
   });
+};
+
+// Функция получения корректной формы слова гость.
+var setNounFormGuests = function (number) {
+  return number === 1 ? 'гостя' : 'гостей';
+};
+
+// Функция получения корректной формы слова комната.
+var setNounFormRooms = function (number) {
+  return number === 1 ? 'комната' : 'комнаты';
+};
+
+// Функция перевода типов жилья на русский язык
+var setType = function (ad) {
+  if (ad.offer.type === 'palace') {
+    return 'Дворец';
+  }
+  if (ad.offer.type === 'flat') {
+    return 'Квартира';
+  }
+  if (ad.offer.type === 'house') {
+    return 'Дом';
+  }
+  if (ad.offer.type === 'bungalo') {
+    return 'Бунгало';
+  }
 };
 
 // функция создания одного элемента
@@ -135,17 +164,59 @@ var generateAds = function (num) {
 
 // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
 var renderPin = function (ad) {
-  var pins = pinsTemplate.cloneNode(true);
-  var pinsImg = pins.querySelector('img');
+  var pin = pinsTemplate.cloneNode(true);
+  var pinImg = pin.querySelector('img');
 
-  pinsImg.src = ad.avatar;
-  pins.style.left = (ad.location.x - PinSize.RADIUS) + 'px';
-  pins.style.top = (ad.location.y - PinSize.HEIGHT) + 'px';
+  pinImg.src = ad.avatar;
+  pin.style.left = (ad.location.x - PinSize.RADIUS) + 'px';
+  pin.style.top = (ad.location.y - PinSize.HEIGHT) + 'px';
 
-  return pins;
+  return pin;
 };
 
-// Функция внеcения изменений в DOM
+// Функция для создания карточки объявления
+var renderCard = function (ad) {
+  var card = cardTemplate.cloneNode(true);
+
+  // Функция добавления фотографий
+  var addPhotos = function () {
+    var photos = card.querySelectorAll('.popup__photo');
+    var adPhotos = card.querySelector('.popup__photos');
+
+    if (ad.offer.photos.length > 1) {
+      for (var i = 1; i < ad.offer.photos.length; i++) {
+        adPhotos.appendChild(photos[0].cloneNode());
+        photos = card.querySelectorAll('.popup__photo');
+        photos[i].setAttribute('src', ad.offer.photos[i]);
+      }
+    }
+    photos[0].setAttribute('src', ad.offer.photos[0]);
+  };
+
+  // Функция добавления удобств
+  function setFeatures() {
+    var popupFeatures = card.querySelector('.popup__features');
+    var popupFeature = card.querySelectorAll('.popup__feature');
+    for (var i = ad.offer.features.length; i < popupFeature.length; i++) {
+      popupFeatures.removeChild(popupFeature[i]);
+    }
+  }
+
+  card.querySelector('.popup__title').textContent = ad.offer.title;
+  card.querySelector('.popup__text--address').textContent = ad.offer.address;
+  card.querySelector('.popup__text--price').textContent = ad.offer.price + ' ' + '₽/ночь';
+  card.querySelector('.popup__type').textContent = setType(ad);
+  card.querySelector('.popup__text--capacity').textContent = ad.offer.rooms + ' ' + setNounFormRooms(ad.offer.rooms) + ' ' + 'для' + ' ' + ad.offer.guests + ' ' + setNounFormGuests(ad.offer.guests);
+  card.querySelector('.popup__text--time').textContent = 'Заезд после' + ' ' + ad.offer.checkin + ', выезд до' + ' ' + ad.offer.checkout;
+  card.querySelector('.popup__description').textContent = ad.offer.description;
+  // card.querySelector('.popup__photo').setAttribute('src', ad.offer.photos);
+  card.querySelector('.popup__avatar').setAttribute('src', ad.avatar);
+  addPhotos(ad);
+  setFeatures(ad);
+  return card;
+};
+
+// Функция внеcения изменений в DOM - отметки на карте
 var renderPins = function (ads) {
   var fragment = document.createDocumentFragment();
   ads.forEach(function (ad) {
@@ -154,13 +225,20 @@ var renderPins = function (ads) {
   mapPins.appendChild(fragment);
 };
 
+// Функция внеcения изменений в DOM - карточка объявления
+var renderCards = function (ads) {
+  var fragment = document.createDocumentFragment();
+  fragment.appendChild(renderCard(ads[0]));
+  map.appendChild(fragment);
+};
+
 // На основе данных, созданных в первом пункте, создаю DOM-элементы, соответствующие меткам на карте,
 // и заполняю их данными из массива.
 
 var mocks = generateAds(USER_COUNT);
 
-// Делаю карту активной
 map.classList.remove('map--faded');
 
-// Отрисовываю сгенерированные DOM-элементы в блок .map__pins.
 renderPins(mocks);
+
+renderCards(mocks);
