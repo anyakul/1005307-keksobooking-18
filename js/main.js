@@ -203,15 +203,17 @@ var getPhotoMarkup = function (url) {
 };
 
 // Функция генерации конечного шаблона списка удобств
-var getFeatureTemplate = function (feature) {
-  return feature
-    .map(getFeatureMarkup);
+var getFeatureTemplate = function (array) {
+  return array
+    .map(getFeatureMarkup)
+    .join('\n');
 };
 
 // Функция генерации конечного шаблона фотографий
 var getPhotoTemplate = function (photo) {
   return photo
-    .map(getPhotoMarkup);
+    .map(getPhotoMarkup)
+    .join('\n');
 };
 
 // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
