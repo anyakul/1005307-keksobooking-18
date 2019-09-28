@@ -4,6 +4,7 @@ var USER_COUNT = 8;
 
 var FEATURE_MARKUP = '<li class="popup__feature popup__feature--$feature"></li>';
 var PHOTO_MARKUP = '<img src="$url" class="popup__photo" width="45" height="40" alt="Фотография жилья">';
+var ENTER_KEYCODE = 13;
 
 var PinSize = {
   WIDTH: 70,
@@ -90,6 +91,12 @@ var offerTypeEnToRu = {
 
 var map = document.querySelector('.map');
 var mapPins = map.querySelector('.map__pins');
+var mousedown = map.querySelector('.map__pin--main');
+var keydown = map.querySelector('.map__pin--main');
+var notice = document.querySelector('.notice');
+var adForm = notice.querySelector('.ad-form');
+var disactivatePageReset = notice.querySelector('.ad-form__reset');
+var disactivatePageSubmit = notice.querySelector('.ad-form__submit');
 var pinsTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
@@ -203,8 +210,8 @@ var getPhotoMarkup = function (url) {
 };
 
 // Функция генерации конечного шаблона списка удобств
-var getFeatureTemplate = function (array) {
-  return array
+var getFeatureTemplate = function (feature) {
+  return feature
     .map(getFeatureMarkup)
     .join('\n');
 };
@@ -257,17 +264,57 @@ var renderPins = function (ads) {
 };
 
 // Функция внеcения изменений в DOM - карточка объявления
-var renderCards = function () {
+var renderCards = function (mocks) {
   map.appendChild(renderCard(mocks[0]));
 };
 
-// На основе данных, созданных в первом пункте, создаю DOM-элементы, соответствующие меткам на карте,
-// и заполняю их данными из массива.
+// Функция показа объявлений
+var showAds = function () {
+  var mocks = generateAds(USER_COUNT);
+  renderPins(mocks);
+  renderCards(mocks);
+};
 
-var mocks = generateAds(USER_COUNT);
+// Функция переключения страницы с неактивного режима на активный
+var makePageActive = function () {
+  map.classList.remove('map--faded');
+  adForm.classList.remove('ad-form--disabled');
+};
 
-map.classList.remove('map--faded');
+// Функция переключения страницы с активного режима на неактивный
+var makePageNotActive = function () {
+  map.classList.add('map--faded');
+  adForm.classList.add('ad-form--disabled');
+};
 
-renderPins(mocks);
+// Функция заполнения поля адреса по местоположению главной метки на карте
+var getAddress = function () {
+  var buttonMain = map.querySelector('.map__pin--main');
+  var address = notice.querySelector('#address');
+  address.setAttribute('value', buttonMain.style.left + '. ' + buttonMain.style.top);
+};
 
-renderCards(mocks);
+// обработчик события переключения страницы с неактивного режима на активный при помощи мышки
+mousedown.addEventListener('click', function () {
+  makePageActive();
+});
+
+// Обработчик события переключения страницы с неактивного режима на активный при помощи клавиатуры
+keydown.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    makePageActive();
+  }
+});
+
+// обработчик события переключения страницы с активного режима на неактивный при сбрасые формы
+disactivatePageReset.addEventListener('click', function () {
+  makePageNotActive();
+});
+
+// обработчик события переключения страницы с активного режима на неактивный при отправке формы
+disactivatePageSubmit.addEventListener('click', function () {
+  makePageNotActive();
+});
+
+showAds();
+getAddress();
