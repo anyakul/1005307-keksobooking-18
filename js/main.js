@@ -4,12 +4,27 @@ var USER_COUNT = 8;
 
 var FEATURE_MARKUP = '<li class="popup__feature popup__feature--$feature"></li>';
 var PHOTO_MARKUP = '<img src="$url" class="popup__photo" width="45" height="40" alt="Фотография жилья">';
-var ENTER_KEYCODE = 13;
+
+var KeyboardKey = {
+  ENTER: 'Enter',
+};
 
 var PinSize = {
   WIDTH: 70,
   HEIGHT: 50,
   RADIUS: 25,
+};
+
+var MainPinSizeNonActive = {
+  WIDTH: 156,
+  HEIGHT: 156,
+  RADIUS: 78,
+};
+
+var MainPinSizeActive = {
+  WIDTH: 65,
+  HEIGHT: 65,
+  RADIUS: 32.5,
 };
 
 var MapRect = {
@@ -91,12 +106,12 @@ var offerTypeEnToRu = {
 
 var map = document.querySelector('.map');
 var mapPins = map.querySelector('.map__pins');
-var mousedown = map.querySelector('.map__pin--main');
-var keydown = map.querySelector('.map__pin--main');
+var mapPinMain = map.querySelector('.map__pin--main');
 var notice = document.querySelector('.notice');
 var adForm = notice.querySelector('.ad-form');
-var disactivatePageReset = notice.querySelector('.ad-form__reset');
-var disactivatePageSubmit = notice.querySelector('.ad-form__submit');
+var address = adForm.querySelector('#address');
+var pageReset = adForm.querySelector('.ad-form__reset');
+var pageSubmit = adForm.querySelector('.ad-form__submit');
 var pinsTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
@@ -276,45 +291,65 @@ var showAds = function () {
 };
 
 // Функция переключения страницы с неактивного режима на активный
-var makePageActive = function () {
+var activatePage = function () {
   map.classList.remove('map--faded');
   adForm.classList.remove('ad-form--disabled');
+  showAds();
 };
 
 // Функция переключения страницы с активного режима на неактивный
-var makePageNotActive = function () {
+var deactivatePage = function () {
   map.classList.add('map--faded');
   adForm.classList.add('ad-form--disabled');
 };
 
-// Функция заполнения поля адреса по местоположению главной метки на карте
-var getAddress = function () {
-  var buttonMain = map.querySelector('.map__pin--main');
-  var address = notice.querySelector('#address');
-  address.setAttribute('value', buttonMain.style.left + '. ' + buttonMain.style.top);
+// Функция вычисления координат
+var getLocationMain = function () {
+  var locationMain = {
+    x: mapPinMain.offsetLeft + MainPinSizeNonActive.RADIUS,
+    y: mapPinMain.offsetTop + (MainPinSizeNonActive.RADIUS + (MainPinSizeNonActive.RADIUS + MainPinSizeActive.RADIUS) / 2),
+  };
+  return locationMain;
 };
 
-// обработчик события переключения страницы с неактивного режима на активный при помощи мышки
-mousedown.addEventListener('click', function () {
-  makePageActive();
-});
+// Функция заполнения поля адреса по местоположению главной метки на карте
+var renderAddress = function () {
+  address.value = getLocationMain().x + '. ' + getLocationMain().y;
+};
+
+// Функция нажатия на клавишу enter
+var isEnterKey = function (evt) {
+  return evt.key === KeyboardKey.ENTER;
+};
+
+// Функция активации страницы по нажатию кнопки мышки на главную метку
+var mousedown = function () {
+  activatePage();
+  mapPinMain.removeEventListener('click', mousedown);
+};
+
+// Функция активации страницы по нажатию клавиши enter на главную метку
+var keydown = function () {
+  if (isEnterKey(keydown)) {
+    activatePage();
+    mapPinMain.removeEventListener('click', keydown);
+  }
+};
+
+// Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
+mapPinMain.addEventListener('click', mousedown);
 
 // Обработчик события переключения страницы с неактивного режима на активный при помощи клавиатуры
-keydown.addEventListener('keydown', function (evt) {
-  if (evt.keyCode === ENTER_KEYCODE) {
-    makePageActive();
-  }
+mapPinMain.addEventListener('keydown', keydown);
+
+// Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
+pageReset.addEventListener('click', function () {
+  deactivatePage();
 });
 
-// обработчик события переключения страницы с активного режима на неактивный при сбрасые формы
-disactivatePageReset.addEventListener('click', function () {
-  makePageNotActive();
+// Обработчик события переключения страницы с активного режима на неактивный при отправке формы
+pageSubmit.addEventListener('click', function () {
+  deactivatePage();
 });
 
-// обработчик события переключения страницы с активного режима на неактивный при отправке формы
-disactivatePageSubmit.addEventListener('click', function () {
-  makePageNotActive();
-});
-
-showAds();
-getAddress();
+renderAddress();
