@@ -110,8 +110,9 @@ var mapPinMain = map.querySelector('.map__pin--main');
 var notice = document.querySelector('.notice');
 var adForm = notice.querySelector('.ad-form');
 var address = adForm.querySelector('#address');
-var pageReset = adForm.querySelector('.ad-form__reset');
-var pageSubmit = adForm.querySelector('.ad-form__submit');
+var adFormReset = adForm.querySelector('.ad-form__reset');
+var adFormSubmit = adForm.querySelector('.ad-form__submit');
+var fields = adForm.querySelectorAll('input, select');
 var pinsTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
@@ -136,31 +137,6 @@ var getAdIds = function (num) {
     index += 1;
     return index < 10 ? '0' + index : String(index);
   });
-};
-
-// Функция получения корректной формы слова
-var pluralize = function (num, one, two, five) {
-  var mod100 = Math.abs(num % 100);
-  if (mod100 > 10 && mod100 < 20) {
-    return five;
-  }
-
-  var mod10 = mod100 % 10;
-  if (mod10 > 1 && mod10 < 5) {
-    return two;
-  }
-
-  return mod10 === 1 ? one : five;
-};
-
-// Функция получения корректной формы слова комната.
-var getRoomEnding = function (rooms) {
-  return pluralize(rooms, 'комната', 'комнаты', 'комнат');
-};
-
-// Функция получения корректной формы слова гость.
-var getGuestEnding = function (guests) {
-  return pluralize(guests, 'гостя', 'гостей', 'гостей');
 };
 
 // функция создания одного элемента
@@ -189,11 +165,6 @@ var makeAd = function (id) {
   };
 };
 
-// функция генерации объявлений
-var generateAds = function (num) {
-  return getAdIds(num).map(makeAd);
-};
-
 // Функция форматирования строки цены за ночь
 var formatOfferPrice = function (offer) {
   return offer.price + ' \u20bd/ночь';
@@ -202,6 +173,36 @@ var formatOfferPrice = function (offer) {
 // Функция получения типа жилья на русском языке
 var getOfferType = function (offer) {
   return offerTypeEnToRu[offer.type];
+};
+
+// Функция получения корректной формы слова
+var pluralize = function (num, one, two, five) {
+  var mod100 = Math.abs(num % 100);
+  if (mod100 > 10 && mod100 < 20) {
+    return five;
+  }
+
+  var mod10 = mod100 % 10;
+  if (mod10 > 1 && mod10 < 5) {
+    return two;
+  }
+
+  return mod10 === 1 ? one : five;
+};
+
+// Функция получения корректной формы слова комната.
+var getRoomEnding = function (rooms) {
+  return pluralize(rooms, 'комната', 'комнаты', 'комнат');
+};
+
+// Функция получения корректной формы слова гость.
+var getGuestEnding = function (guests) {
+  return pluralize(guests, 'гостя', 'гостей', 'гостей');
+};
+
+// функция генерации объявлений
+var generateAds = function (num) {
+  return getAdIds(num).map(makeAd);
 };
 
 // Функция для форматирования строки количества гостей и комнат.
@@ -231,7 +232,7 @@ var getFeatureTemplate = function (feature) {
     .join('\n');
 };
 
-// Функция генерации конечного шаблона фотографий
+// Функция генерации конечного шаблона списка фотографий
 var getPhotoTemplate = function (photo) {
   return photo
     .map(getPhotoMarkup)
@@ -290,10 +291,25 @@ var showAds = function () {
   renderCards(mocks);
 };
 
+// Функция добавления атрибута disabled всем элементам формы в неактивном состоянии
+var deactivateFields = function () {
+  fields.forEach(function (field) {
+    field.disabled = true;
+  });
+};
+
+// Функция удаления атрибута disabled всем элементам формы в активном состоянии
+var activateFields = function () {
+  fields.forEach(function (field) {
+    field.disabled = false;
+  });
+};
+
 // Функция переключения страницы с неактивного режима на активный
 var activatePage = function () {
   map.classList.remove('map--faded');
   adForm.classList.remove('ad-form--disabled');
+  activateFields();
   showAds();
 };
 
@@ -336,6 +352,9 @@ var keydown = function () {
   }
 };
 
+renderAddress();
+deactivateFields();
+
 // Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
 mapPinMain.addEventListener('click', mousedown);
 
@@ -343,13 +362,11 @@ mapPinMain.addEventListener('click', mousedown);
 mapPinMain.addEventListener('keydown', keydown);
 
 // Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
-pageReset.addEventListener('click', function () {
+adFormReset.addEventListener('click', function () {
   deactivatePage();
 });
 
 // Обработчик события переключения страницы с активного режима на неактивный при отправке формы
-pageSubmit.addEventListener('click', function () {
+adFormSubmit.addEventListener('click', function () {
   deactivatePage();
 });
-
-renderAddress();
