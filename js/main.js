@@ -111,8 +111,6 @@ var notice = document.querySelector('.notice');
 var adForm = notice.querySelector('.ad-form');
 var address = adForm.querySelector('#address');
 var adFormReset = adForm.querySelector('.ad-form__reset');
-var adFormSubmit = adForm.querySelector('.ad-form__submit');
-var adFormReset = adForm.querySelector('.ad-form__reset');
 var roomNumber = adForm.querySelector('#room_number');
 var guestNumber = adForm.querySelector('#capacity');
 var fields = adForm.querySelectorAll('input, select');
@@ -287,8 +285,6 @@ var renderCards = function (mocks) {
   map.appendChild(renderCard(mocks[0]));
 };
 
-
-
 // Функция показа объявлений
 var showAds = function () {
   var mocks = generateAds(USER_COUNT);
@@ -393,4 +389,3 @@ mapPinMain.addEventListener('keydown', keydown);
 adFormReset.addEventListener('click', function () {
   deactivatePage();
 });
-
