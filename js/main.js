@@ -112,6 +112,9 @@ var adForm = notice.querySelector('.ad-form');
 var address = adForm.querySelector('#address');
 var adFormReset = adForm.querySelector('.ad-form__reset');
 var adFormSubmit = adForm.querySelector('.ad-form__submit');
+var adFormReset = adForm.querySelector('.ad-form__reset');
+var roomNumber = adForm.querySelector('#room_number');
+var guestNumber = adForm.querySelector('#capacity');
 var fields = adForm.querySelectorAll('input, select');
 var pinsTemplate = document.querySelector('#pin')
     .content
@@ -284,11 +287,27 @@ var renderCards = function (mocks) {
   map.appendChild(renderCard(mocks[0]));
 };
 
+
+
 // Функция показа объявлений
 var showAds = function () {
   var mocks = generateAds(USER_COUNT);
   renderPins(mocks);
   renderCards(mocks);
+};
+
+// Функция вычисления координат
+var getLocationMain = function () {
+  var locationMain = {
+    x: mapPinMain.offsetLeft + MainPinSizeNonActive.RADIUS,
+    y: mapPinMain.offsetTop + (MainPinSizeNonActive.RADIUS + (MainPinSizeNonActive.RADIUS + MainPinSizeActive.RADIUS) / 2),
+  };
+  return locationMain;
+};
+
+// Функция заполнения поля адреса по местоположению главной метки на карте
+var renderAddress = function () {
+  address.value = getLocationMain().x + '. ' + getLocationMain().y;
 };
 
 // Функция добавления атрибута disabled всем элементам формы в неактивном состоянии
@@ -309,39 +328,27 @@ var activateFields = function () {
 var activatePage = function () {
   map.classList.remove('map--faded');
   adForm.classList.remove('ad-form--disabled');
-  activateFields();
   showAds();
+  activateFields();
 };
 
 // Функция переключения страницы с активного режима на неактивный
 var deactivatePage = function () {
   map.classList.add('map--faded');
   adForm.classList.add('ad-form--disabled');
-};
-
-// Функция вычисления координат
-var getLocationMain = function () {
-  var locationMain = {
-    x: mapPinMain.offsetLeft + MainPinSizeNonActive.RADIUS,
-    y: mapPinMain.offsetTop + (MainPinSizeNonActive.RADIUS + (MainPinSizeNonActive.RADIUS + MainPinSizeActive.RADIUS) / 2),
-  };
-  return locationMain;
-};
-
-// Функция заполнения поля адреса по местоположению главной метки на карте
-var renderAddress = function () {
-  address.value = getLocationMain().x + '. ' + getLocationMain().y;
-};
-
-// Функция нажатия на клавишу enter
-var isEnterKey = function (evt) {
-  return evt.key === KeyboardKey.ENTER;
+  deactivateFields();
 };
 
 // Функция активации страницы по нажатию кнопки мышки на главную метку
 var mousedown = function () {
   activatePage();
   mapPinMain.removeEventListener('click', mousedown);
+  renderAddress();
+};
+
+// Функция нажатия на клавишу enter
+var isEnterKey = function (evt) {
+  return evt.key === KeyboardKey.ENTER;
 };
 
 // Функция активации страницы по нажатию клавиши enter на главную метку
@@ -351,6 +358,27 @@ var keydown = function () {
     mapPinMain.removeEventListener('click', keydown);
   }
 };
+
+// Функция установки соответствия количества гостей с количеством комнат.
+var validateCapacityGuest = function () {
+  if (roomNumber.value === '1' && (guestNumber.value === '0' || guestNumber.value === '2' || guestNumber.value === '3')) {
+    guestNumber.setCustomValidity('В однокомнатную квартиру разместить можно только 1 гостя');
+  } else if (roomNumber.value === '2' && (guestNumber.value === '0' || guestNumber.value === '3')) {
+    guestNumber.setCustomValidity('В 2х комнатную квартиру разместить можно только 1 или 2х гостей');
+  } else if (roomNumber.value === '3' && guestNumber.value === '0') {
+    guestNumber.setCustomValidity('В 3х комнатную квартиру разместить можно только 1, 2х или 3х гостей');
+  } else if (roomNumber.value === '100' && !(guestNumber.value === '0')) {
+    guestNumber.setCustomValidity('В 100 комнатной квартире резмещать гостей нельзя');
+  } else {
+    guestNumber.setCustomValidity('');
+  }
+};
+
+roomNumber.addEventListener('change', function () {
+  validateCapacityGuest();
+});
+
+guestNumber.addEventListener('change', validateCapacityGuest);
 
 renderAddress();
 deactivateFields();
@@ -366,7 +394,3 @@ adFormReset.addEventListener('click', function () {
   deactivatePage();
 });
 
-// Обработчик события переключения страницы с активного режима на неактивный при отправке формы
-adFormSubmit.addEventListener('click', function () {
-  deactivatePage();
-});
