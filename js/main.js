@@ -15,16 +15,10 @@ var PinSize = {
   RADIUS: 25,
 };
 
-var MainPinSizeNonActive = {
-  WIDTH: 156,
-  HEIGHT: 156,
-  RADIUS: 78,
-};
-
-var MainPinSizeActive = {
+var MainPinSize = {
   WIDTH: 65,
-  HEIGHT: 65,
-  RADIUS: 32.5,
+  HEIGHT: 80,
+  RADIUS: 32,
 };
 
 var MapRect = {
@@ -106,14 +100,16 @@ var offerTypeEnToRu = {
 
 var map = document.querySelector('.map');
 var mapPins = map.querySelector('.map__pins');
-var mapPinMain = map.querySelector('.map__pin--main');
+var mapMainPin = map.querySelector('.map__pin--main');
 var notice = document.querySelector('.notice');
 var adForm = notice.querySelector('.ad-form');
 var address = adForm.querySelector('#address');
 var adFormReset = adForm.querySelector('.ad-form__reset');
 var roomNumber = adForm.querySelector('#room_number');
 var guestNumber = adForm.querySelector('#capacity');
-var fields = adForm.querySelectorAll('input, select');
+var adFields = adForm.querySelectorAll('input, select');
+var filterForm = map.querySelectorAll('.map__filters');
+var filterFields = map.querySelectorAll('input, select');
 var pinsTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
@@ -292,31 +288,50 @@ var showAds = function () {
   renderCards(mocks);
 };
 
-// Функция вычисления координат
-var getLocationMain = function () {
+// Функция вычисления координат главной метки в активном состоянии
+var getLocationMainPinNotActive = function () {
   var locationMain = {
-    x: mapPinMain.offsetLeft + MainPinSizeNonActive.RADIUS,
-    y: mapPinMain.offsetTop + (MainPinSizeNonActive.RADIUS + (MainPinSizeNonActive.RADIUS + MainPinSizeActive.RADIUS) / 2),
+    x: mapMainPin.offsetLeft + MainPinSize.RADIUS,
+    y: mapMainPin.offsetTop + MainPinSize.RADIUS,
+  };
+  return locationMain;
+};
+
+// Функция вычисления координат главной метки в неактивном состоянии
+var getLocationMainPinActive = function () {
+  var locationMain = {
+    x: mapMainPin.offsetLeft + MainPinSize.RADIUS,
+    y: Math.floor(mapMainPin.offsetTop + MainPinSize.RADIUS + MainPinSize.RADIUS * 3 / 2),
   };
   return locationMain;
 };
 
 // Функция заполнения поля адреса по местоположению главной метки на карте
-var renderAddress = function () {
-  address.value = getLocationMain().x + '. ' + getLocationMain().y;
+var renderAddressPinNotActive = function () {
+  address.value = getLocationMainPinNotActive().x + '. ' + getLocationMainPinNotActive().y;
+};
+
+var renderAddressPinActive = function () {
+  address.value = getLocationMainPinActive().x + '. ' + getLocationMainPinActive().y;
 };
 
 // Функция добавления атрибута disabled всем элементам формы в неактивном состоянии
 var deactivateFields = function () {
-  fields.forEach(function (field) {
-    field.disabled = true;
+  adFields.forEach(function (adField) {
+    adField.disabled = true;
+  });
+  filterFields.forEach(function (filterField) {
+    filterField.disabled = true;
   });
 };
 
 // Функция удаления атрибута disabled всем элементам формы в активном состоянии
 var activateFields = function () {
-  fields.forEach(function (field) {
-    field.disabled = false;
+  adFields.forEach(function (adField) {
+    adField.disabled = false;
+  });
+  filterFields.forEach(function (filterField) {
+    filterField.disabled = false;
   });
 };
 
@@ -333,13 +348,16 @@ var deactivatePage = function () {
   map.classList.add('map--faded');
   adForm.classList.add('ad-form--disabled');
   deactivateFields();
+  adForm.reset();
+  filterForm.reset();
 };
 
 // Функция активации страницы по нажатию кнопки мышки на главную метку
-var mousedown = function () {
+var mouseDownHandler = function () {
   activatePage();
-  mapPinMain.removeEventListener('click', mousedown);
-  renderAddress();
+  mapMainPin.removeEventListener('keydown', keyDownHandler);
+  mapMainPin.removeEventListener('mousedown', mouseDownHandler);
+  renderAddressPinActive();
 };
 
 // Функция нажатия на клавишу enter
@@ -348,10 +366,11 @@ var isEnterKey = function (evt) {
 };
 
 // Функция активации страницы по нажатию клавиши enter на главную метку
-var keydown = function () {
-  if (isEnterKey(keydown)) {
+var keyDownHandler = function (evt) {
+  if (isEnterKey(evt)) {
     activatePage();
-    mapPinMain.removeEventListener('click', keydown);
+    mapMainPin.removeEventListener('keydown', keyDownHandler);
+    mapMainPin.removeEventListener('mousedown', mouseDownHandler);
   }
 };
 
@@ -376,14 +395,14 @@ roomNumber.addEventListener('change', function () {
 
 guestNumber.addEventListener('change', validateCapacityGuest);
 
-renderAddress();
+renderAddressPinNotActive();
 deactivateFields();
 
 // Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
-mapPinMain.addEventListener('click', mousedown);
+mapMainPin.addEventListener('mousedown', mouseDownHandler);
 
 // Обработчик события переключения страницы с неактивного режима на активный при помощи клавиатуры
-mapPinMain.addEventListener('keydown', keydown);
+mapMainPin.addEventListener('keydown', keyDownHandler);
 
 // Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
 adFormReset.addEventListener('click', function () {
