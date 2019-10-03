@@ -35,7 +35,7 @@ var MinPrice = {
   FLAT: 1000,
   HOUSE: 5000,
   PALACE: 10000,
-}
+};
 
 var Price = {
   MIN: 1,
@@ -109,6 +109,7 @@ var offerTypeEnToRu = {
 
 var map = document.querySelector('.map');
 var mapPins = map.querySelector('.map__pins');
+var mapPin = map.querySelector('.map__pin');
 var mainPin = map.querySelector('.map__pin--main');
 var filterForm = map.querySelector('.map__filters');
 var filterFields = map.querySelectorAll('.map__filter, .map__checkbox');
@@ -116,7 +117,7 @@ var notice = document.querySelector('.notice');
 var adForm = notice.querySelector('.ad-form');
 var adFields = adForm.querySelectorAll('fieldset');
 var adFormReset = adForm.querySelector('.ad-form__reset');
-var adFormTitleInput = adForm.querySelector('#title');
+var title = adForm.querySelector('#title');
 var address = adForm.querySelector('#address');
 var roomNumber = adForm.querySelector('#room_number');
 var guestNumber = adForm.querySelector('#capacity');
@@ -448,16 +449,13 @@ document.addEventListener('click', function (evt) {
 
 // Функция проверки заголовка требованиям
 var validateTitle = function () {
-  if (adFormTitleInput.validity.tooShort) {
+  if (title.validity.tooShort) {
     title.setCustomValidity('Длина заголовка должна быть не меньше 30 символов');
-  }
-  else if (adFormTitleInput.validity.tooLong) {
+  } else if (title.validity.tooLong) {
     title.setCustomValidity('Длина заголовка должна быть не больше 100 символов');
-  }
-  else if (adFormTitleInput.validity.valueMissing) {
+  } else if (title.validity.valueMissing) {
     title.setCustomValidity('Пожалуйста, введите заголовок');
-  }
-  else {
+  } else {
     title.setCustomValidity('');
   }
 };
@@ -467,40 +465,34 @@ var getPlaceholderAndMinValue = function (minPrice) {
   price.max = maxPrice;
   price.placeholder = minPrice;
   price.min = minPrice;
-}
+};
 
 // Функция расстановки правильных плейсхолдеров, максимальной цены, и минимальной цены за сутки в зависимости
 // от типа жилья
-var setPlaceholderAndMinValue = function (type) {
+var setPlaceholderAndMinValue = function () {
   if (type.value === 'bungalo') {
     getPlaceholderAndMinValue(MinPrice.BUNGALO);
-  }
-  else if (type.value === 'flat') {
+  } else if (type.value === 'flat') {
     getPlaceholderAndMinValue(MinPrice.FLAT);
-  }
-  else if (type.value === 'house') {
+  } else if (type.value === 'house') {
     getPlaceholderAndMinValue(MinPrice.HOUSE);
-  }
-  else if (type.value === 'palace') {
+  } else if (type.value === 'palace') {
     getPlaceholderAndMinValue(MinPrice.PALACE);
   }
-}
+};
 
 // Функция проверки соответствия введенной цены минимальной цене выбранного типа жилья
 var validateTypePrice = function () {
-  if (adFormPriceInput.validity.rangeOverflow) {
+  if (price.validity.rangeOverflow) {
     price.setCustomValidity('Цена не может превышать 1 000 000 рублей');
-  }
-  if (setPlaceholderAndMinValue('flat') && adFormPriceInput.validity.rangeUnderflow) {
+  } else if (setPlaceholderAndMinValue('flat') && price.validity.rangeUnderflow) {
     price.setCustomValidity('Значание должно быть больше или равно 1000');
-  }
-  if (setPlaceholderAndMinValue('house') && adFormPriceInput.validity.rangeUnderflow) {
+  } else if (setPlaceholderAndMinValue('house') && price.validity.rangeUnderflow) {
     price.setCustomValidity('Значание должно быть больше или равно 5000');
-  }
-  if (setPlaceholderAndMinValue('palace') && adFormPriceInput.validity.rangeUnderflow) {
+  } else if (setPlaceholderAndMinValue('palace') && price.validity.rangeUnderflow) {
     price.setCustomValidity('Значание должно быть больше или равно 10000');
   }
-}
+};
 
 // Функция расстановки соответствия времени заезда и времени выезда
 var setTimeOutInput = function () {
