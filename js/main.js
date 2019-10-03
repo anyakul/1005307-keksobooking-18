@@ -5,10 +5,20 @@ var USER_COUNT = 8;
 var FEATURE_MARKUP = '<li class="popup__feature popup__feature--$feature"></li>';
 var PHOTO_MARKUP = '<img src="$url" class="popup__photo" width="45" height="40" alt="Фотография жилья">';
 
+var KeyboardKey = {
+  ENTER: 'Enter',
+};
+
 var PinSize = {
   WIDTH: 70,
   HEIGHT: 50,
   RADIUS: 25,
+};
+
+var MainPinSize = {
+  WIDTH: 65,
+  HEIGHT: 80,
+  RADIUS: 32,
 };
 
 var MapRect = {
@@ -90,6 +100,16 @@ var offerTypeEnToRu = {
 
 var map = document.querySelector('.map');
 var mapPins = map.querySelector('.map__pins');
+var mainPin = map.querySelector('.map__pin--main');
+var notice = document.querySelector('.notice');
+var adForm = notice.querySelector('.ad-form');
+var address = adForm.querySelector('#address');
+var adFormReset = adForm.querySelector('.ad-form__reset');
+var roomNumber = adForm.querySelector('#room_number');
+var guestNumber = adForm.querySelector('#capacity');
+var adFields = adForm.querySelectorAll('fieldset');
+var filterForm = map.querySelector('.map__filters');
+var filterFields = map.querySelectorAll('.map__filter, .map__checkbox');
 var pinsTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
@@ -114,31 +134,6 @@ var getAdIds = function (num) {
     index += 1;
     return index < 10 ? '0' + index : String(index);
   });
-};
-
-// Функция получения корректной формы слова
-var pluralize = function (num, one, two, five) {
-  var mod100 = Math.abs(num % 100);
-  if (mod100 > 10 && mod100 < 20) {
-    return five;
-  }
-
-  var mod10 = mod100 % 10;
-  if (mod10 > 1 && mod10 < 5) {
-    return two;
-  }
-
-  return mod10 === 1 ? one : five;
-};
-
-// Функция получения корректной формы слова комната.
-var getRoomEnding = function (rooms) {
-  return pluralize(rooms, 'комната', 'комнаты', 'комнат');
-};
-
-// Функция получения корректной формы слова гость.
-var getGuestEnding = function (guests) {
-  return pluralize(guests, 'гостя', 'гостей', 'гостей');
 };
 
 // функция создания одного элемента
@@ -167,11 +162,6 @@ var makeAd = function (id) {
   };
 };
 
-// функция генерации объявлений
-var generateAds = function (num) {
-  return getAdIds(num).map(makeAd);
-};
-
 // Функция форматирования строки цены за ночь
 var formatOfferPrice = function (offer) {
   return offer.price + ' \u20bd/ночь';
@@ -180,6 +170,36 @@ var formatOfferPrice = function (offer) {
 // Функция получения типа жилья на русском языке
 var getOfferType = function (offer) {
   return offerTypeEnToRu[offer.type];
+};
+
+// Функция получения корректной формы слова
+var pluralize = function (num, one, two, five) {
+  var mod100 = Math.abs(num % 100);
+  if (mod100 > 10 && mod100 < 20) {
+    return five;
+  }
+
+  var mod10 = mod100 % 10;
+  if (mod10 > 1 && mod10 < 5) {
+    return two;
+  }
+
+  return mod10 === 1 ? one : five;
+};
+
+// Функция получения корректной формы слова комната.
+var getRoomEnding = function (rooms) {
+  return pluralize(rooms, 'комната', 'комнаты', 'комнат');
+};
+
+// Функция получения корректной формы слова гость.
+var getGuestEnding = function (guests) {
+  return pluralize(guests, 'гостя', 'гостей', 'гостей');
+};
+
+// функция генерации объявлений
+var generateAds = function (num) {
+  return getAdIds(num).map(makeAd);
 };
 
 // Функция для форматирования строки количества гостей и комнат.
@@ -203,13 +223,13 @@ var getPhotoMarkup = function (url) {
 };
 
 // Функция генерации конечного шаблона списка удобств
-var getFeatureTemplate = function (array) {
-  return array
+var getFeatureTemplate = function (feature) {
+  return feature
     .map(getFeatureMarkup)
     .join('\n');
 };
 
-// Функция генерации конечного шаблона фотографий
+// Функция генерации конечного шаблона списка фотографий
 var getPhotoTemplate = function (photo) {
   return photo
     .map(getPhotoMarkup)
@@ -257,17 +277,125 @@ var renderPins = function (ads) {
 };
 
 // Функция внеcения изменений в DOM - карточка объявления
-var renderCards = function () {
+var renderCards = function (mocks) {
   map.appendChild(renderCard(mocks[0]));
 };
 
-// На основе данных, созданных в первом пункте, создаю DOM-элементы, соответствующие меткам на карте,
-// и заполняю их данными из массива.
+// Функция показа объявлений
+var showAds = function () {
+  var mocks = generateAds(USER_COUNT);
+  renderPins(mocks);
+  renderCards(mocks);
+};
 
-var mocks = generateAds(USER_COUNT);
+// Функция вычисления координат главной метки
+var getMainPinCoords = function (height) {
+  return {
+    x: mainPin.offsetLeft + MainPinSize.RADIUS,
+    y: mainPin.offsetTop + height
+  };
+};
 
-map.classList.remove('map--faded');
+// Функция заполнения поля адреса по местоположению главной метки на карте
+var renderAddressInput = function (coords) {
+  address.value = coords.x + ', ' + coords.y;
+};
 
-renderPins(mocks);
+var setDisabled = function (element) {
+  element.disabled = true;
+};
 
-renderCards(mocks);
+var unsetDisabled = function (element) {
+  element.disabled = false;
+};
+
+// Функция удаления атрибута disabled всем элементам формы в активном состоянии
+var activateFields = function () {
+  adFields.forEach(unsetDisabled);
+  filterFields.forEach(unsetDisabled);
+};
+
+// Функция добавления атрибута disabled всем элементам формы в неактивном состоянии
+var deactivateFields = function () {
+  adFields.forEach(setDisabled);
+  filterFields.forEach(setDisabled);
+};
+
+// Функция переключения страницы с неактивного режима на активный
+var activatePage = function () {
+  map.classList.remove('map--faded');
+  adForm.classList.remove('ad-form--disabled');
+  showAds();
+  activateFields();
+  renderAddressInput(getMainPinCoords(MainPinSize.HEIGHT));
+
+  mainPin.removeEventListener('keydown', onMainPinEnterPress);
+  mainPin.removeEventListener('mousedown', onMainPinMouseDown);
+};
+
+// Функция переключения страницы с активного режима на неактивный
+var deactivatePage = function () {
+  map.classList.add('map--faded');
+  adForm.classList.add('ad-form--disabled');
+  deactivateFields();
+  adForm.reset();
+  filterForm.reset();
+  renderAddressInput(getMainPinCoords(MainPinSize.RADIUS));
+
+  mainPin.addEventListener('keydown', onMainPinEnterPress);
+  mainPin.addEventListener('mousedown', onMainPinMouseDown);
+};
+
+// Функция активации страницы по нажатию кнопки мышки на главную метку
+var onMainPinMouseDown = function () {
+  activatePage();
+};
+
+// Функция нажатия на клавишу enter
+var isEnterKey = function (evt) {
+  return evt.key === KeyboardKey.ENTER;
+};
+
+// Функция активации страницы по нажатию клавиши enter на главную метку
+var onMainPinEnterPress = function (evt) {
+  if (isEnterKey(evt)) {
+    activatePage();
+  }
+};
+
+// Функция установки соответствия количества гостей с количеством комнат.
+var validateRoomAndGuest = function () {
+  if (roomNumber.value === '1' && guestNumber.value !== roomNumber.value) {
+    guestNumber.setCustomValidity('В однокомнатную квартиру разместить можно только 1 гостя');
+  } else if (roomNumber.value === '2' && (guestNumber.value === '0' || guestNumber.value > roomNumber.value)) {
+    guestNumber.setCustomValidity('В 2х комнатную квартиру разместить можно только 1 или 2х гостей');
+  } else if (roomNumber.value === '3' && guestNumber.value === '0') {
+    guestNumber.setCustomValidity('В 3х комнатную квартиру разместить можно только 1, 2х или 3х гостей');
+  } else if (roomNumber.value === '100' && !(guestNumber.value === '0')) {
+    guestNumber.setCustomValidity('В 100 комнатной квартире резмещать гостей нельзя');
+  } else {
+    guestNumber.setCustomValidity('');
+  }
+};
+
+var onRoomGuestChange = function () {
+  validateRoomAndGuest();
+};
+
+var onFormResetClick = function () {
+  deactivatePage();
+};
+
+roomNumber.addEventListener('change', onRoomGuestChange);
+guestNumber.addEventListener('change', onRoomGuestChange);
+
+// Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
+mainPin.addEventListener('mousedown', onMainPinMouseDown);
+
+// Обработчик события переключения страницы с неактивного режима на активный при помощи клавиатуры
+mainPin.addEventListener('keydown', onMainPinEnterPress);
+
+// Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
+adFormReset.addEventListener('click', onFormResetClick);
+
+deactivatePage();
