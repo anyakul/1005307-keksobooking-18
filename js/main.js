@@ -100,7 +100,7 @@ var offerTypeEnToRu = {
 
 var map = document.querySelector('.map');
 var mapPins = map.querySelector('.map__pins');
-var mapMainPin = map.querySelector('.map__pin--main');
+var mainPin = map.querySelector('.map__pin--main');
 var notice = document.querySelector('.notice');
 var adForm = notice.querySelector('.ad-form');
 var address = adForm.querySelector('#address');
@@ -291,8 +291,8 @@ var showAds = function () {
 // Функция вычисления координат главной метки
 var getMainPinCoords = function (height) {
   return {
-    x: mapMainPin.offsetLeft + MainPinSize.RADIUS,
-    y: mapMainPin.offsetTop + height
+    x: mainPin.offsetLeft + MainPinSize.RADIUS,
+    y: mainPin.offsetTop + height
   };
 };
 
@@ -327,26 +327,27 @@ var activatePage = function () {
   adForm.classList.remove('ad-form--disabled');
   showAds();
   activateFields();
-  mapMainPin.removeEventListener('keydown', keyDownHandler);
-  mapMainPin.removeEventListener('mousedown', mouseDownHandler);
-  mapMainPin.removeEventListener('mousedown', mouseDownHandler);
   renderAddressInput(getMainPinCoords(MainPinSize.HEIGHT));
+
+  mainPin.removeEventListener('keydown', onMainPinEnterPress);
+  mainPin.removeEventListener('mousedown', onMainPinMouseDown);
 };
 
 // Функция переключения страницы с активного режима на неактивный
-var deactivatePageHandler = function () {
+var deactivatePage = function () {
   map.classList.add('map--faded');
   adForm.classList.add('ad-form--disabled');
   deactivateFields();
   adForm.reset();
   filterForm.reset();
-  mapMainPin.addEventListener('keydown', keyDownHandler);
-  mapMainPin.addEventListener('mousedown', mouseDownHandler);
   renderAddressInput(getMainPinCoords(MainPinSize.RADIUS));
+
+  mainPin.addEventListener('keydown', onMainPinEnterPress);
+  mainPin.addEventListener('mousedown', onMainPinMouseDown);
 };
 
 // Функция активации страницы по нажатию кнопки мышки на главную метку
-var mouseDownHandler = function () {
+var onMainPinMouseDown = function () {
   activatePage();
 };
 
@@ -356,14 +357,14 @@ var isEnterKey = function (evt) {
 };
 
 // Функция активации страницы по нажатию клавиши enter на главную метку
-var keyDownHandler = function (evt) {
+var onMainPinEnterPress = function (evt) {
   if (isEnterKey(evt)) {
     activatePage();
   }
 };
 
 // Функция установки соответствия количества гостей с количеством комнат.
-var validateCapacityGuestHandler = function () {
+var validateRoomAndGuest = function () {
   if (roomNumber.value === '1' && guestNumber.value !== roomNumber.value) {
     guestNumber.setCustomValidity('В однокомнатную квартиру разместить можно только 1 гостя');
   } else if (roomNumber.value === '2' && (guestNumber.value === '0' || guestNumber.value > roomNumber.value)) {
@@ -377,20 +378,24 @@ var validateCapacityGuestHandler = function () {
   }
 };
 
-roomNumber.addEventListener('change', function () {
-  validateCapacityGuestHandler();
-});
+var onRoomGuestChange = function () {
+  validateRoomAndGuest();
+};
 
-guestNumber.addEventListener('change', validateCapacityGuestHandler);
+var onFormResetClick = function () {
+  deactivatePage();
+};
 
-renderAddressInput(getMainPinCoords(MainPinSize.RADIUS));
-deactivateFields();
+roomNumber.addEventListener('change', onRoomGuestChange);
+guestNumber.addEventListener('change', onRoomGuestChange);
 
 // Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
-mapMainPin.addEventListener('mousedown', mouseDownHandler);
+mainPin.addEventListener('mousedown', onMainPinMouseDown);
 
 // Обработчик события переключения страницы с неактивного режима на активный при помощи клавиатуры
-mapMainPin.addEventListener('keydown', keyDownHandler);
+mainPin.addEventListener('keydown', onMainPinEnterPress);
 
 // Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
-adFormReset.addEventListener('mousedown', deactivatePageHandler);
+adFormReset.addEventListener('click', onFormResetClick);
+
+deactivatePage();
