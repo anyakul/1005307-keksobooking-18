@@ -4,9 +4,11 @@ var USER_COUNT = 8;
 
 var FEATURE_MARKUP = '<li class="popup__feature popup__feature--$feature"></li>';
 var PHOTO_MARKUP = '<img src="$url" class="popup__photo" width="45" height="40" alt="Фотография жилья">';
+var maxPrice = 1000000;
 
 var KeyboardKey = {
   ENTER: 'Enter',
+  ESC: 'Escape',
 };
 
 var PinSize = {
@@ -27,6 +29,13 @@ var MapRect = {
   RIGHT: 1200,
   BOTTOM: 630,
 };
+
+var MinPrice = {
+  BUNGALO: 0,
+  FLAT: 1000,
+  HOUSE: 5000,
+  PALACE: 10000,
+}
 
 var Price = {
   MIN: 1,
@@ -101,15 +110,21 @@ var offerTypeEnToRu = {
 var map = document.querySelector('.map');
 var mapPins = map.querySelector('.map__pins');
 var mainPin = map.querySelector('.map__pin--main');
-var notice = document.querySelector('.notice');
-var adForm = notice.querySelector('.ad-form');
-var address = adForm.querySelector('#address');
-var adFormReset = adForm.querySelector('.ad-form__reset');
-var roomNumber = adForm.querySelector('#room_number');
-var guestNumber = adForm.querySelector('#capacity');
-var adFields = adForm.querySelectorAll('fieldset');
 var filterForm = map.querySelector('.map__filters');
 var filterFields = map.querySelectorAll('.map__filter, .map__checkbox');
+var notice = document.querySelector('.notice');
+var adForm = notice.querySelector('.ad-form');
+var adFields = adForm.querySelectorAll('fieldset');
+var adFormReset = adForm.querySelector('.ad-form__reset');
+var adFormTitleInput = adForm.querySelector('#title');
+var address = adForm.querySelector('#address');
+var roomNumber = adForm.querySelector('#room_number');
+var guestNumber = adForm.querySelector('#capacity');
+var price = adForm.querySelector('#price');
+var timeIn = adForm.querySelector('#timein');
+var timeOut = adForm.querySelector('#timeout');
+var type = adForm.querySelector('#type');
+
 var pinsTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
@@ -117,6 +132,8 @@ var pinsTemplate = document.querySelector('#pin')
 var cardTemplate = document.querySelector('#card')
     .content
     .querySelector('.map__card');
+
+// ФУНКЦИИ ДЛЯ СЛУЧАЙНОГО СОЗДАНИЯ ОБЪЯВЛЕНИЙ
 
 // Функция получения рандомных чисел в определенном диапозоне
 var getRandomNumber = function (min, max) {
@@ -281,12 +298,14 @@ var renderCards = function (mocks) {
   map.appendChild(renderCard(mocks[0]));
 };
 
+var mocks = generateAds(USER_COUNT);
+
 // Функция показа объявлений
 var showAds = function () {
-  var mocks = generateAds(USER_COUNT);
   renderPins(mocks);
-  renderCards(mocks);
 };
+
+// АКТИВАЦИЯ И ДЕАКТИВАЦИЯ СТРАНИЦЫ.
 
 // Функция вычисления координат главной метки
 var getMainPinCoords = function (height) {
@@ -356,11 +375,140 @@ var isEnterKey = function (evt) {
   return evt.key === KeyboardKey.ENTER;
 };
 
+// Функция нажатия на клавишу escape
+var isEscKey = function (evt) {
+  return evt.key === KeyboardKey.ESC;
+};
+
 // Функция активации страницы по нажатию клавиши enter на главную метку
 var onMainPinEnterPress = function (evt) {
   if (isEnterKey(evt)) {
     activatePage();
   }
+};
+
+// Функция деактивации страницы при нажатии на кнопку очистить
+var onFormResetClick = function () {
+  deactivatePage();
+};
+
+renderAddressInput(getMainPinCoords(MainPinSize.RADIUS));
+
+// Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
+mainPin.addEventListener('mousedown', onMainPinMouseDown);
+
+// Обработчик события переключения страницы с неактивного режима на активный при помощи клавиатуры
+mainPin.addEventListener('keydown', onMainPinEnterPress);
+
+// Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
+adFormReset.addEventListener('click', onFormResetClick);
+
+
+// ОТКРЫТИЕ И ЗАКРЫТИЕ КАРТОЧКИ ОБЪЯВЛЕНИЯ
+
+// Функция закрытия карточки объявления
+var closeCard = function () {
+  var pinPopup = document.querySelector('.map__card');
+  if (map.contains(pinPopup)) {
+    map.removeChild(pinPopup);
+  }
+};
+
+// Обработчик события открытие попапа с информацией об объявлении при клике на пин (при помощи делегирования)
+mapPins.addEventListener('click', function (evt) {
+  closeCard();
+  if (evt.target.closest('.map__pin:not(.map__pin--main)')) {
+    renderCards(mocks);
+  }
+});
+
+// Обработчик события открытие попапа с информацией об объявлении при нажатии Enter с фокусом на пине (при помощи делегирования)
+mapPins.addEventListener('keydown', function (evt) {
+  if ((isEnterKey(evt)) && (document.activeElement === mapPin)) {
+    var currentData = evt.target.closest('.map__pin:not(.map__pin--main)').dataset.id;
+    renderCard(renderCard[currentData]);
+  }
+});
+
+// Обработчик события закрытие попапа с информацией об объявлении при нажатии ECS
+document.addEventListener('keydown', function (evt) {
+  if (isEscKey(evt)) {
+    closeCard();
+  }
+});
+
+// Обработчик события закрытие попапа с информацией об объявлении при клике на крестик (при помощи делегирования)
+document.addEventListener('click', function (evt) {
+  if (evt.target.matches('.popup__close')) {
+    closeCard();
+  }
+});
+
+// ВАЛИДАЦИЯ ФОРМЫ ОБЪЯВЛЕНИЯ
+
+// Функция проверки заголовка требованиям
+var validateTitle = function () {
+  if (adFormTitleInput.validity.tooShort) {
+    title.setCustomValidity('Длина заголовка должна быть не меньше 30 символов');
+  }
+  else if (adFormTitleInput.validity.tooLong) {
+    title.setCustomValidity('Длина заголовка должна быть не больше 100 символов');
+  }
+  else if (adFormTitleInput.validity.valueMissing) {
+    title.setCustomValidity('Пожалуйста, введите заголовок');
+  }
+  else {
+    title.setCustomValidity('');
+  }
+};
+
+// Функция установки установки типа жилья и минимальной цены за ночь
+var getPlaceholderAndMinValue = function (minPrice) {
+  price.max = maxPrice;
+  price.placeholder = minPrice;
+  price.min = minPrice;
+}
+
+// Функция расстановки правильных плейсхолдеров, максимальной цены, и минимальной цены за сутки в зависимости
+// от типа жилья
+var setPlaceholderAndMinValue = function (type) {
+  if (type.value === 'bungalo') {
+    getPlaceholderAndMinValue(MinPrice.BUNGALO);
+  }
+  else if (type.value === 'flat') {
+    getPlaceholderAndMinValue(MinPrice.FLAT);
+  }
+  else if (type.value === 'house') {
+    getPlaceholderAndMinValue(MinPrice.HOUSE);
+  }
+  else if (type.value === 'palace') {
+    getPlaceholderAndMinValue(MinPrice.PALACE);
+  }
+}
+
+// Функция проверки соответствия введенной цены минимальной цене выбранного типа жилья
+var validateTypePrice = function () {
+  if (adFormPriceInput.validity.rangeOverflow) {
+    price.setCustomValidity('Цена не может превышать 1 000 000 рублей');
+  }
+  if (setPlaceholderAndMinValue('flat') && adFormPriceInput.validity.rangeUnderflow) {
+    price.setCustomValidity('Значание должно быть больше или равно 1000');
+  }
+  if (setPlaceholderAndMinValue('house') && adFormPriceInput.validity.rangeUnderflow) {
+    price.setCustomValidity('Значание должно быть больше или равно 5000');
+  }
+  if (setPlaceholderAndMinValue('palace') && adFormPriceInput.validity.rangeUnderflow) {
+    price.setCustomValidity('Значание должно быть больше или равно 10000');
+  }
+}
+
+// Функция расстановки соответствия времени заезда и времени выезда
+var setTimeOutInput = function () {
+  timeIn.value = timeOut.value;
+};
+
+var setTimeInInput = function () {
+  timeOut.value = timeIn.value;
 };
 
 // Функция установки соответствия количества гостей с количеством комнат.
@@ -378,24 +526,36 @@ var validateRoomAndGuest = function () {
   }
 };
 
-var onRoomGuestChange = function () {
+// Обработчик события проверки соответствия заголовка требованиям
+title.addEventListener('input', function () {
+  validateTitle();
+});
+
+// Обработчик события проверки соответствия типа жилья и цены за ночь
+type.addEventListener('change', function () {
+  setPlaceholderAndMinValue(type);
+});
+
+price.addEventListener('change', function () {
+  validateTypePrice();
+});
+
+// Обработчик события установки соответствия времени заезда и выезда
+timeIn.addEventListener('change', function () {
+  setTimeInInput();
+});
+
+timeOut.addEventListener('change', function () {
+  setTimeOutInput();
+});
+
+// Обработчик события проверки соответствия количества комнат и гостей
+roomNumber.addEventListener('change', function () {
   validateRoomAndGuest();
-};
+});
 
-var onFormResetClick = function () {
-  deactivatePage();
-};
+guestNumber.addEventListener('change', function () {
+  validateRoomAndGuest();
+});
 
-roomNumber.addEventListener('change', onRoomGuestChange);
-guestNumber.addEventListener('change', onRoomGuestChange);
-
-// Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
-mainPin.addEventListener('mousedown', onMainPinMouseDown);
-
-// Обработчик события переключения страницы с неактивного режима на активный при помощи клавиатуры
-mainPin.addEventListener('keydown', onMainPinEnterPress);
-
-// Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
-adFormReset.addEventListener('click', onFormResetClick);
-
-deactivatePage();
+deactivateFields();
