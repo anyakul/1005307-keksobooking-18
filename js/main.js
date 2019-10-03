@@ -107,9 +107,9 @@ var address = adForm.querySelector('#address');
 var adFormReset = adForm.querySelector('.ad-form__reset');
 var roomNumber = adForm.querySelector('#room_number');
 var guestNumber = adForm.querySelector('#capacity');
-var adFields = adForm.querySelectorAll('input, select, :not(#address)');
+var adFields = adForm.querySelectorAll('fieldset');
 var filterForm = map.querySelector('.map__filters');
-var filterFields = map.querySelectorAll('input, select');
+var filterFields = map.querySelectorAll('.map__filter, .map__checkbox');
 var pinsTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
