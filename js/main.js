@@ -463,19 +463,6 @@ var setOfferPrice = function (price) {
   priceInput.placeholder = price;
 };
 
-// Функция проверки соответствия введенной цены минимальной цене выбранного типа жилья
-var validateTypePrice = function () {
-  if (priceInput.validity.rangeOverflow) {
-    priceInput.setCustomValidity('Цена не может превышать 1 000 000 рублей');
-  } else if (setOfferPrice('flat') && priceInput.validity.rangeUnderflow) {
-    priceInput.setCustomValidity('Значение должно быть больше или равно 1000');
-  } else if (setOfferPrice('house') && priceInput.validity.rangeUnderflow) {
-    priceInput.setCustomValidity('Значение должно быть больше или равно 5000');
-  } else if (setOfferPrice('palace') && priceInput.validity.rangeUnderflow) {
-    priceInput.setCustomValidity('Значение должно быть больше или равно 10000');
-  }
-};
-
 // Функция расстановки соответствия времени заезда и времени выезда
 var setTimeOutInput = function () {
   timeInSelect.value = timeOutSelect.value;
