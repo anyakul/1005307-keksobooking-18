@@ -4,11 +4,13 @@ var USER_COUNT = 8;
 
 var FEATURE_MARKUP = '<li class="popup__feature popup__feature--$feature"></li>';
 var PHOTO_MARKUP = '<img src="$url" class="popup__photo" width="45" height="40" alt="Фотография жилья">';
-var maxPrice = 1000000;
 
 var KeyboardKey = {
   ENTER: 'Enter',
-  ESC: 'Escape',
+  escKeyMap: {
+    Esc: true,
+    Escape: true,
+  },
 };
 
 var PinSize = {
@@ -30,11 +32,11 @@ var MapRect = {
   BOTTOM: 630,
 };
 
-var MinPrice = {
-  BUNGALO: 0,
-  FLAT: 1000,
-  HOUSE: 5000,
-  PALACE: 10000,
+var offerTypeToMinPrice = {
+  bungalo: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000,
 };
 
 var Price = {
@@ -109,7 +111,6 @@ var offerTypeEnToRu = {
 
 var map = document.querySelector('.map');
 var mapPins = map.querySelector('.map__pins');
-var mapPin = map.querySelector('.map__pin');
 var mainPin = map.querySelector('.map__pin--main');
 var filterForm = map.querySelector('.map__filters');
 var filterFields = map.querySelectorAll('.map__filter, .map__checkbox');
@@ -117,14 +118,14 @@ var notice = document.querySelector('.notice');
 var adForm = notice.querySelector('.ad-form');
 var adFields = adForm.querySelectorAll('fieldset');
 var adFormReset = adForm.querySelector('.ad-form__reset');
-var title = adForm.querySelector('#title');
+var titleInput = adForm.querySelector('#title');
 var address = adForm.querySelector('#address');
 var roomNumber = adForm.querySelector('#room_number');
 var guestNumber = adForm.querySelector('#capacity');
-var price = adForm.querySelector('#price');
-var timeIn = adForm.querySelector('#timein');
-var timeOut = adForm.querySelector('#timeout');
-var type = adForm.querySelector('#type');
+var priceInput = adForm.querySelector('#price');
+var timeInSelect = adForm.querySelector('#timein');
+var timeOutSelect = adForm.querySelector('#timeout');
+var typeSelect = adForm.querySelector('#type');
 
 var pinsTemplate = document.querySelector('#pin')
     .content
@@ -294,12 +295,12 @@ var renderPins = function (ads) {
   mapPins.appendChild(fragment);
 };
 
+var mocks = generateAds(USER_COUNT);
+
 // Функция внеcения изменений в DOM - карточка объявления
-var renderCards = function (mocks) {
+var renderCards = function () {
   map.appendChild(renderCard(mocks[0]));
 };
-
-var mocks = generateAds(USER_COUNT);
 
 // Функция показа объявлений
 var showAds = function () {
@@ -373,12 +374,12 @@ var onMainPinMouseDown = function () {
 
 // Функция нажатия на клавишу enter
 var isEnterKey = function (evt) {
-  return evt.key === KeyboardKey.ENTER;
+  return evt.key === KeyboardKey.ENTER || evt.key === KeyboardKey.ESC_IE;
 };
 
 // Функция нажатия на клавишу escape
 var isEscKey = function (evt) {
-  return evt.key === KeyboardKey.ESC;
+  return KeyboardKey.escKeyMap[evt.key];
 };
 
 // Функция активации страницы по нажатию клавиши enter на главную метку
@@ -415,19 +416,10 @@ var closeCard = function () {
   }
 };
 
-// Обработчик события открытие попапа с информацией об объявлении при клике на пин (при помощи делегирования)
 mapPins.addEventListener('click', function (evt) {
-  closeCard();
   if (evt.target.closest('.map__pin:not(.map__pin--main)')) {
-    renderCards(mocks);
-  }
-});
-
-// Обработчик события открытие попапа с информацией об объявлении при нажатии Enter с фокусом на пине (при помощи делегирования)
-mapPins.addEventListener('keydown', function (evt) {
-  if ((isEnterKey(evt)) && (document.activeElement === mapPin)) {
-    var currentData = evt.target.closest('.map__pin:not(.map__pin--main)').dataset.id;
-    renderCard(renderCard[currentData]);
+    var currentData = evt.target.closest('.map__pin:not(.map__pin--main)');
+    map.appendChild(renderCard(mocks[currentData]));
   }
 });
 
@@ -446,61 +438,51 @@ document.addEventListener('click', function (evt) {
 });
 
 // ВАЛИДАЦИЯ ФОРМЫ ОБЪЯВЛЕНИЯ
-
 // Функция проверки заголовка требованиям
 var validateTitle = function () {
-  if (title.validity.tooShort) {
-    title.setCustomValidity('Длина заголовка должна быть не меньше 30 символов');
-  } else if (title.validity.tooLong) {
-    title.setCustomValidity('Длина заголовка должна быть не больше 100 символов');
-  } else if (title.validity.valueMissing) {
-    title.setCustomValidity('Пожалуйста, введите заголовок');
+  if (titleInput.validity.tooShort) {
+    titleInput.setCustomValidity('Длина заголовка должна быть не меньше 30 символов');
+  } else if (titleInput.validity.tooLong) {
+    titleInput.setCustomValidity('Длина заголовка должна быть не больше 100 символов');
+  } else if (titleInput.validity.valueMissing) {
+    titleInput.setCustomValidity('Пожалуйста, введите заголовок');
   } else {
-    title.setCustomValidity('');
+    titleInput.setCustomValidity('');
   }
 };
 
 // Функция установки установки типа жилья и минимальной цены за ночь
-var getPlaceholderAndMinValue = function (minPrice) {
-  price.max = maxPrice;
-  price.placeholder = minPrice;
-  price.min = minPrice;
+var getOfferMinPrice = function () {
+  return offerTypeToMinPrice[typeSelect.value];
 };
 
 // Функция расстановки правильных плейсхолдеров, максимальной цены, и минимальной цены за сутки в зависимости
 // от типа жилья
-var setPlaceholderAndMinValue = function () {
-  if (type.value === 'bungalo') {
-    getPlaceholderAndMinValue(MinPrice.BUNGALO);
-  } else if (type.value === 'flat') {
-    getPlaceholderAndMinValue(MinPrice.FLAT);
-  } else if (type.value === 'house') {
-    getPlaceholderAndMinValue(MinPrice.HOUSE);
-  } else if (type.value === 'palace') {
-    getPlaceholderAndMinValue(MinPrice.PALACE);
-  }
+var setOfferPrice = function (price) {
+  priceInput.min = price;
+  priceInput.placeholder = price;
 };
 
 // Функция проверки соответствия введенной цены минимальной цене выбранного типа жилья
 var validateTypePrice = function () {
-  if (price.validity.rangeOverflow) {
-    price.setCustomValidity('Цена не может превышать 1 000 000 рублей');
-  } else if (setPlaceholderAndMinValue('flat') && price.validity.rangeUnderflow) {
-    price.setCustomValidity('Значание должно быть больше или равно 1000');
-  } else if (setPlaceholderAndMinValue('house') && price.validity.rangeUnderflow) {
-    price.setCustomValidity('Значание должно быть больше или равно 5000');
-  } else if (setPlaceholderAndMinValue('palace') && price.validity.rangeUnderflow) {
-    price.setCustomValidity('Значание должно быть больше или равно 10000');
+  if (priceInput.validity.rangeOverflow) {
+    priceInput.setCustomValidity('Цена не может превышать 1 000 000 рублей');
+  } else if (setOfferPrice('flat') && priceInput.validity.rangeUnderflow) {
+    priceInput.setCustomValidity('Значение должно быть больше или равно 1000');
+  } else if (setOfferPrice('house') && priceInput.validity.rangeUnderflow) {
+    priceInput.setCustomValidity('Значение должно быть больше или равно 5000');
+  } else if (setOfferPrice('palace') && priceInput.validity.rangeUnderflow) {
+    priceInput.setCustomValidity('Значение должно быть больше или равно 10000');
   }
 };
 
 // Функция расстановки соответствия времени заезда и времени выезда
 var setTimeOutInput = function () {
-  timeIn.value = timeOut.value;
+  timeInSelect.value = timeOutSelect.value;
 };
 
 var setTimeInInput = function () {
-  timeOut.value = timeIn.value;
+  timeOutSelect.value = timeInSelect.value;
 };
 
 // Функция установки соответствия количества гостей с количеством комнат.
@@ -519,25 +501,22 @@ var validateRoomAndGuest = function () {
 };
 
 // Обработчик события проверки соответствия заголовка требованиям
-title.addEventListener('input', function () {
+titleInput.addEventListener('blur', function () {
   validateTitle();
 });
 
-// Обработчик события проверки соответствия типа жилья и цены за ночь
-type.addEventListener('change', function () {
-  setPlaceholderAndMinValue(type);
+// Обработчик события установки плейсхолдеров и минимальной цены
+typeSelect.addEventListener('change', function (evt) {
+  setOfferPrice(getOfferMinPrice(evt.target.value));
 });
 
-price.addEventListener('change', function () {
-  validateTypePrice();
-});
 
 // Обработчик события установки соответствия времени заезда и выезда
-timeIn.addEventListener('change', function () {
+timeInSelect.addEventListener('change', function () {
   setTimeInInput();
 });
 
-timeOut.addEventListener('change', function () {
+timeOutSelect.addEventListener('change', function () {
   setTimeOutInput();
 });
 
@@ -546,8 +525,6 @@ roomNumber.addEventListener('change', function () {
   validateRoomAndGuest();
 });
 
-guestNumber.addEventListener('change', function () {
-  validateRoomAndGuest();
+adForm.addEventListener('submit', function () {
+  validateTypePrice();
 });
-
-deactivateFields();
