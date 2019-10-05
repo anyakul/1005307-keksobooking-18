@@ -515,3 +515,5 @@ roomNumber.addEventListener('change', function () {
 adForm.addEventListener('submit', function () {
   validateTypePrice();
 });
+
+deactivatePage();
