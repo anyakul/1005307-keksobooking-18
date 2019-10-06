@@ -7,6 +7,8 @@ var PHOTO_MARKUP = '<img src="$url" class="popup__photo" width="45" height="40" 
 
 var KeyboardKey = {
   ENTER: 'Enter',
+  ESCAPE: 'Esc',
+  ESCAPE_IE: 'Escape',
 };
 
 var PinSize = {
@@ -26,6 +28,13 @@ var MapRect = {
   TOP: 130,
   RIGHT: 1200,
   BOTTOM: 630,
+};
+
+var offerTypeToMinPrice = {
+  bungalo: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000,
 };
 
 var Price = {
@@ -101,15 +110,21 @@ var offerTypeEnToRu = {
 var map = document.querySelector('.map');
 var mapPins = map.querySelector('.map__pins');
 var mainPin = map.querySelector('.map__pin--main');
-var notice = document.querySelector('.notice');
-var adForm = notice.querySelector('.ad-form');
-var address = adForm.querySelector('#address');
-var adFormReset = adForm.querySelector('.ad-form__reset');
-var roomNumber = adForm.querySelector('#room_number');
-var guestNumber = adForm.querySelector('#capacity');
-var adFields = adForm.querySelectorAll('fieldset');
 var filterForm = map.querySelector('.map__filters');
 var filterFields = map.querySelectorAll('.map__filter, .map__checkbox');
+var notice = document.querySelector('.notice');
+var adForm = notice.querySelector('.ad-form');
+var adFields = adForm.querySelectorAll('fieldset');
+var adFormReset = adForm.querySelector('.ad-form__reset');
+var titleInput = adForm.querySelector('#title');
+var address = adForm.querySelector('#address');
+var roomNumber = adForm.querySelector('#room_number');
+var guestNumber = adForm.querySelector('#capacity');
+var priceInput = adForm.querySelector('#price');
+var timeInSelect = adForm.querySelector('#timein');
+var timeOutSelect = adForm.querySelector('#timeout');
+var typeSelect = adForm.querySelector('#type');
+
 var pinsTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
@@ -117,6 +132,8 @@ var pinsTemplate = document.querySelector('#pin')
 var cardTemplate = document.querySelector('#card')
     .content
     .querySelector('.map__card');
+
+// ФУНКЦИИ ДЛЯ СЛУЧАЙНОГО СОЗДАНИЯ ОБЪЯВЛЕНИЙ
 
 // Функция получения рандомных чисел в определенном диапозоне
 var getRandomNumber = function (min, max) {
@@ -244,6 +261,7 @@ var renderPin = function (ad) {
   pinImg.src = ad.avatar;
   pin.style.left = (ad.location.x - PinSize.RADIUS) + 'px';
   pin.style.top = (ad.location.y - PinSize.HEIGHT) + 'px';
+  pin.dataset.id = ad.id;
 
   return pin;
 };
@@ -276,17 +294,24 @@ var renderPins = function (ads) {
   mapPins.appendChild(fragment);
 };
 
+var normalizeAds = function (ad, idx) {
+  ad.id = idx;
+  return ad;
+};
+
+var ads = generateAds(USER_COUNT).map(normalizeAds);
+
 // Функция внеcения изменений в DOM - карточка объявления
-var renderCards = function (mocks) {
-  map.appendChild(renderCard(mocks[0]));
+var showCard = function (ad) {
+  map.appendChild(renderCard(ad));
 };
 
 // Функция показа объявлений
 var showAds = function () {
-  var mocks = generateAds(USER_COUNT);
-  renderPins(mocks);
-  renderCards(mocks);
+  renderPins(ads);
 };
+
+// АКТИВАЦИЯ И ДЕАКТИВАЦИЯ СТРАНИЦЫ.
 
 // Функция вычисления координат главной метки
 var getMainPinCoords = function (height) {
@@ -356,11 +381,101 @@ var isEnterKey = function (evt) {
   return evt.key === KeyboardKey.ENTER;
 };
 
+// Функция нажатия на клавишу escape
+var isEscKey = function (evt) {
+  return evt.key === KeyboardKey.ESCAPE
+    || evt.key === KeyboardKey.ESCAPE_IE;
+};
+
 // Функция активации страницы по нажатию клавиши enter на главную метку
 var onMainPinEnterPress = function (evt) {
   if (isEnterKey(evt)) {
     activatePage();
   }
+};
+
+// Функция деактивации страницы при нажатии на кнопку очистить
+var onFormResetClick = function () {
+  deactivatePage();
+};
+
+renderAddressInput(getMainPinCoords(MainPinSize.RADIUS));
+
+// Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
+mainPin.addEventListener('mousedown', onMainPinMouseDown);
+
+// Обработчик события переключения страницы с неактивного режима на активный при помощи клавиатуры
+mainPin.addEventListener('keydown', onMainPinEnterPress);
+
+// Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
+adFormReset.addEventListener('click', onFormResetClick);
+
+
+// ОТКРЫТИЕ И ЗАКРЫТИЕ КАРТОЧКИ ОБЪЯВЛЕНИЯ
+
+// Функция закрытия карточки объявления
+var closeCard = function () {
+  var pinPopup = document.querySelector('.map__card');
+  if (map.contains(pinPopup)) {
+    map.removeChild(pinPopup);
+  }
+};
+
+mapPins.addEventListener('click', function (evt) {
+  var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
+  if (pin !== null) {
+    closeCard();
+    showCard(ads[+pin.dataset.id]);
+  }
+});
+
+// Обработчик события закрытие попапа с информацией об объявлении при нажатии ECS
+document.addEventListener('keydown', function (evt) {
+  if (isEscKey(evt)) {
+    closeCard();
+  }
+});
+
+// Обработчик события закрытие попапа с информацией об объявлении при клике на крестик (при помощи делегирования)
+document.addEventListener('click', function (evt) {
+  if (evt.target.matches('.popup__close')) {
+    closeCard();
+  }
+});
+
+// ВАЛИДАЦИЯ ФОРМЫ ОБЪЯВЛЕНИЯ
+// Функция проверки заголовка требованиям
+var validateTitle = function () {
+  if (titleInput.validity.tooShort) {
+    titleInput.setCustomValidity('Длина заголовка должна быть не меньше 30 символов');
+  } else if (titleInput.validity.tooLong) {
+    titleInput.setCustomValidity('Длина заголовка должна быть не больше 100 символов');
+  } else if (titleInput.validity.valueMissing) {
+    titleInput.setCustomValidity('Пожалуйста, введите заголовок');
+  } else {
+    titleInput.setCustomValidity('');
+  }
+};
+
+// Функция установки установки типа жилья и минимальной цены за ночь
+var getOfferMinPrice = function () {
+  return offerTypeToMinPrice[typeSelect.value];
+};
+
+// Функция расстановки правильных плейсхолдеров, максимальной цены, и минимальной цены за сутки в зависимости
+// от типа жилья
+var setOfferPrice = function (price) {
+  priceInput.min = price;
+  priceInput.placeholder = price;
+};
+
+// Функция расстановки соответствия времени заезда и времени выезда
+var setTimeOutInput = function () {
+  timeInSelect.value = timeOutSelect.value;
+};
+
+var setTimeInInput = function () {
+  timeOutSelect.value = timeInSelect.value;
 };
 
 // Функция установки соответствия количества гостей с количеством комнат.
@@ -378,24 +493,29 @@ var validateRoomAndGuest = function () {
   }
 };
 
-var onRoomGuestChange = function () {
+// Обработчик события проверки соответствия заголовка требованиям
+titleInput.addEventListener('blur', function () {
+  validateTitle();
+});
+
+// Обработчик события установки плейсхолдеров и минимальной цены
+typeSelect.addEventListener('change', function (evt) {
+  setOfferPrice(getOfferMinPrice(evt.target.value));
+});
+
+
+// Обработчик события установки соответствия времени заезда и выезда
+timeInSelect.addEventListener('change', function () {
+  setTimeInInput();
+});
+
+timeOutSelect.addEventListener('change', function () {
+  setTimeOutInput();
+});
+
+// Обработчик события проверки соответствия количества комнат и гостей
+roomNumber.addEventListener('change', function () {
   validateRoomAndGuest();
-};
-
-var onFormResetClick = function () {
-  deactivatePage();
-};
-
-roomNumber.addEventListener('change', onRoomGuestChange);
-guestNumber.addEventListener('change', onRoomGuestChange);
-
-// Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
-mainPin.addEventListener('mousedown', onMainPinMouseDown);
-
-// Обработчик события переключения страницы с неактивного режима на активный при помощи клавиатуры
-mainPin.addEventListener('keydown', onMainPinEnterPress);
-
-// Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
-adFormReset.addEventListener('click', onFormResetClick);
+});
 
 deactivatePage();
