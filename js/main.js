@@ -263,6 +263,7 @@ var renderPin = function (ad) {
   pinImg.src = ad.avatar;
   pin.style.left = (ad.location.x - PinSize.RADIUS) + 'px';
   pin.style.top = (ad.location.y - PinSize.HEIGHT) + 'px';
+  pin.dataset.id = ad.id;
 
   return pin;
 };
@@ -295,16 +296,21 @@ var renderPins = function (ads) {
   mapPins.appendChild(fragment);
 };
 
-var mocks = generateAds(USER_COUNT);
+var normalizeAds = function (ad, idx) {
+  ad.id = idx;
+  return ad;
+};
+
+var ads = generateAds(USER_COUNT).map(normalizeAds);
 
 // Функция внеcения изменений в DOM - карточка объявления
-var renderCards = function () {
-  map.appendChild(renderCard(mocks[0]));
+var showCard = function (ad) {
+  map.appendChild(renderCard(ad));
 };
 
 // Функция показа объявлений
 var showAds = function () {
-  renderPins(mocks);
+  renderPins(ads);
 };
 
 // АКТИВАЦИЯ И ДЕАКТИВАЦИЯ СТРАНИЦЫ.
@@ -417,9 +423,10 @@ var closeCard = function () {
 };
 
 mapPins.addEventListener('click', function (evt) {
-  if (evt.target.closest('.map__pin:not(.map__pin--main)')) {
-    var currentData = evt.target.closest('.map__pin:not(.map__pin--main)');
-    map.appendChild(renderCard(mocks[currentData]));
+  var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
+  if (pin !== null) {
+    closeCard();
+    showCard(ads[+pin.dataset.id]);
   }
 });
 
@@ -510,10 +517,6 @@ timeOutSelect.addEventListener('change', function () {
 // Обработчик события проверки соответствия количества комнат и гостей
 roomNumber.addEventListener('change', function () {
   validateRoomAndGuest();
-});
-
-adForm.addEventListener('submit', function () {
-  validateTypePrice();
 });
 
 deactivatePage();
