@@ -7,10 +7,8 @@ var PHOTO_MARKUP = '<img src="$url" class="popup__photo" width="45" height="40" 
 
 var KeyboardKey = {
   ENTER: 'Enter',
-  escKeyMap: {
-    Esc: true,
-    Escape: true,
-  },
+  ESCAPE: 'Esc',
+  ESCAPE_IE: 'Escape',
 };
 
 var PinSize = {
@@ -380,12 +378,13 @@ var onMainPinMouseDown = function () {
 
 // Функция нажатия на клавишу enter
 var isEnterKey = function (evt) {
-  return evt.key === KeyboardKey.ENTER || evt.key === KeyboardKey.ESC_IE;
+  return evt.key === KeyboardKey.ENTER;
 };
 
 // Функция нажатия на клавишу escape
 var isEscKey = function (evt) {
-  return KeyboardKey.escKeyMap[evt.key];
+  return evt.key === KeyboardKey.ESCAPE
+    || evt.key === KeyboardKey.ESCAPE_IE;
 };
 
 // Функция активации страницы по нажатию клавиши enter на главную метку
