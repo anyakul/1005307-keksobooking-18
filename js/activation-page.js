@@ -143,7 +143,7 @@
   };
 
   // Обработчик события загрузка страницы
-  document.addEventListener('DOMContentLoaded', activatePage);
+  document.addEventListener('DOMContentLoaded', deactivatePage);
 
   // Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
   util.mainPin.addEventListener('mousedown', onMainPinMouseDown);
