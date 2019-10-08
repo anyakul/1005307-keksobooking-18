@@ -1,7 +1,8 @@
 'use strict';
 
 (function () {
-  var util = window.util;
+  var FEATURE_MARKUP = '<li class="popup__feature popup__feature--$feature"></li>';
+  var PHOTO_MARKUP = '<img src="$url" class="popup__photo" width="45" height="40" alt="Фотография жилья">';
 
   // Функция форматирования строки цены за ночь
   var formatOfferPrice = function (offer) {
@@ -10,17 +11,17 @@
 
   // Функция получения типа жилья на русском языке
   var getOfferType = function (offer) {
-    return util.offerTypeEnToRu[offer.type];
+    return window.data.offerTypeEnToRu[offer.type];
   };
 
   // Функция получения корректной формы слова комната.
   var getRoomEnding = function (rooms) {
-    return util.pluralize(rooms, 'комната', 'комнаты', 'комнат');
+    return window.util.pluralize(rooms, 'комната', 'комнаты', 'комнат');
   };
 
   // Функция получения корректной формы слова гость.
   var getGuestEnding = function (guests) {
-    return util.pluralize(guests, 'гостя', 'гостей', 'гостей');
+    return window.util.pluralize(guests, 'гостя', 'гостей', 'гостей');
   };
 
   // Функция для форматирования строки количества гостей и комнат.
@@ -35,12 +36,12 @@
 
   // Функция добавления удобств
   var getFeatureMarkup = function (feature) {
-    return util.FEATURE_MARKUP.replace('$feature', feature);
+    return FEATURE_MARKUP.replace('$feature', feature);
   };
 
   // функция добавления фотографий
   var getPhotoMarkup = function (url) {
-    return util.PHOTO_MARKUP.replace('$url', url);
+    return PHOTO_MARKUP.replace('$url', url);
   };
 
   // Функция генерации конечного шаблона списка удобств
@@ -59,7 +60,7 @@
 
   // Функция для создания карточки объявления
   var renderCard = function (ad) {
-    var card = util.cardTemplate.cloneNode(true);
+    var card = window.domRef.cardTemplate.cloneNode(true);
     var offer = ad.offer;
 
     card.querySelector('img').src = ad.avatar;
@@ -78,45 +79,55 @@
 
   // Функция внеcения изменений в DOM - карточка объявления
   var showCard = function (ad) {
-    util.map.appendChild(renderCard(ad));
+    window.domRef.map.appendChild(renderCard(ad));
   };
 
-  // Функция закрытия карточки объявления
-  window.card.closeCard = function () {
-    var pinPopup = document.querySelector('.map__card');
-    if (util.map.contains(pinPopup)) {
-      util.map.removeChild(pinPopup);
-    }
-  };
-
-  // Функция обработчика события показа карточки объявления
-  window.card.onPinShowCard = function (evt) {
-    var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
-    var pinActive = util.mapPins.querySelector('.map__pin--active:not(.map__pin--main)');
-    if (pin !== null) {
-      window.card.closeCard();
-      showCard(window.ads[+pin.dataset.id]);
-      pin.classList.add('map__pin--active');
-    }
-    if ((pin !== null) && (pinActive !== null)) {
+  // функция удаления класса active
+  var removeClassActive = function () {
+    var pinActive = window.domRef.mapPins.querySelector('.map__pin--active:not(.map__pin--main)');
+    if (pinActive !== null) {
       pinActive.classList.remove('map__pin--active');
     }
   };
 
+  // Функция закрытия карточки объявления
+  var closeCard = function () {
+    var pinPopup = document.querySelector('.map__card');
+    if (window.domRef.map.contains(pinPopup)) {
+      window.domRef.map.removeChild(pinPopup);
+      removeClassActive();
+    }
+  };
+
+  // Функция обработчика события показа карточки объявления
+  var onPinShow = function (evt) {
+    var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
+    if (pin !== null) {
+      closeCard();
+      showCard(window.data.ads[+pin.dataset.id]);
+      pin.classList.add('map__pin--active');
+    }
+  };
+
   // Обработчик события открытия карточки объявления
-  util.mapPins.addEventListener('click', window.card.onPinShowCard);
+  window.domRef.mapPins.addEventListener('click', onPinShow);
 
   // Обработчик события закрытие попапа с информацией об объявлении при нажатии ECS
   document.addEventListener('keydown', function (evt) {
-    if (util.isEscKey(evt)) {
-      window.card.closeCard();
+    if (window.util.isEscKey(evt)) {
+      closeCard();
     }
   });
 
   // Обработчик события закрытие попапа с информацией об объявлении при клике на крестик
   document.addEventListener('click', function (evt) {
     if (evt.target.matches('.popup__close')) {
-      window.card.closeCard();
+      closeCard();
     }
   });
+
+  window.card = {
+    onPinShow: onPinShow,
+    close: closeCard,
+  };
 })();

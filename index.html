@@ -117,7 +117,7 @@
         </fieldset>
         <fieldset class="ad-form__element">
           <label class="ad-form__label" for="price">Цена за ночь, руб.</label>
-          <input id="price" name="price" type="number" placeholder="1000" max="1000000" required>
+          <input id="price" name="price" type="number" placeholder="0" max="1000000" required>
         </fieldset>
         <fieldset class="ad-form__element ad-form__element--time">
           <label class="ad-form__label" for="timein">Время заезда и выезда</label>
@@ -247,19 +247,30 @@
       <button class="error__button" href="#">Попробовать снова</button>
     </div>
   </template>
-  
+
   <!-- Общие переменные -->
   <script src="js/util.js"></script>
 
+  <!--Переменные селекторов-->
+  <script src="js/dom-ref.js"></script>
+
+  <!-- Активация и деактивация страницы -->
+  <script src="js/data.js"></script>
+
+  <!-- Активация и деактивация страницы -->
+  <script src="js/main-pin.js"></script>
+
+  <!-- Пины -->
+  <script src="js/pin.js"></script>
+
   <!--Показ карточки объявления-->
   <script src="js/card.js"></script>
-  
-    <!-- Активация и деактивация страницы -->
-  <script src="js/activation-page.js"></script>
-  
+
   <!--Форма объявления-->
   <script src="js/adform.js"></script>
 
-  <!--<script src="js/main.js"></script>-->
+  <!-- Активация и деактивация страницы -->
+  <script src="js/activation-page.js"></script>
+
  </body>
 </html>
