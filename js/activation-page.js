@@ -18,7 +18,6 @@
     window.domRef.map.classList.remove('map--faded');
     window.domRef.adForm.classList.remove('ad-form--disabled');
     activateFields();
-    window.adForm.renderAddressInput(window.mainPins.getMainPinCoords(window.mainPins.mainPinSize.HEIGHT));
     window.pins.renderPins(window.data.ads);
     window.mainPins.mainPin.removeEventListener('keydown', onMainPinEnterPress);
     window.mainPins.mainPin.removeEventListener('mousedown', onMainPinMouseDown);
@@ -31,7 +30,6 @@
     window.domRef.adForm.classList.add('ad-form--disabled');
     window.domRef.adForm.reset();
     window.domRef.filterForm.reset();
-    window.adForm.renderAddressInput(window.mainPins.getMainPinCoords(window.mainPins.mainPinSize.RADIUS));
     window.mainPins.setPinStartPosition();
     deactivateFields();
     window.mainPins.mainPin.addEventListener('keydown', onMainPinEnterPress);

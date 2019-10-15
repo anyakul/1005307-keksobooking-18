@@ -8,8 +8,8 @@
   };
 
   var StartCoordinates = {
-    x: 570,
-    y: 375
+    X: 570,
+    Y: 375
   };
 
   var mainPin = window.domRef.map.querySelector('.map__pin--main');
@@ -24,8 +24,9 @@
 
   // Установка главного пина на старотвую позицию при деактивации страницы
   var setPinStartPosition = function () {
-    mainPin.style.left = StartCoordinates.x + 'px';
-    mainPin.style.top = StartCoordinates.y + 'px';
+    mainPin.style.left = StartCoordinates.X + 'px';
+    mainPin.style.top = StartCoordinates.Y + 'px';
+    window.adForm.renderAddressInput(getMainPinCoords(MainPinSize.RADIUS));
   };
 
   // функция вычисления координат главной метки после ее передвижения
@@ -86,8 +87,6 @@
 
   window.mainPins = {
     mainPin: mainPin,
-    mainPinSize: MainPinSize,
-    getMainPinCoords: getMainPinCoords,
     setPinStartPosition: setPinStartPosition,
   };
 })();
