@@ -18,7 +18,7 @@
     window.domRef.map.classList.remove('map--faded');
     window.domRef.adForm.classList.remove('ad-form--disabled');
     activateFields();
-    window.pins.renderPins(window.data.ads);
+    window.pin.render(window.data.ads);
     window.mainPins.mainPin.removeEventListener('keydown', onMainPinEnterPress);
     window.mainPins.mainPin.removeEventListener('mousedown', onMainPinMouseDown);
     window.domRef.mapPins.addEventListener('click', window.card.onPinShowCard);
@@ -35,7 +35,7 @@
     window.mainPins.mainPin.addEventListener('keydown', onMainPinEnterPress);
     window.mainPins.mainPin.addEventListener('mousedown', onMainPinMouseDown);
     window.mainPins.mainPin.removeEventListener('click', window.card.onPinShow);
-    window.pins.removePins();
+    window.pin.remove();
     window.card.close();
   };
 

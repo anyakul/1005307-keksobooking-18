@@ -12,6 +12,13 @@
     Y: 375
   };
 
+  var MapRect = {
+    LEFT: 50,
+    TOP: 130,
+    RIGHT: 1150,
+    BOTTOM: 630,
+  };
+
   var mainPin = window.domRef.map.querySelector('.map__pin--main');
 
   // Функция вычисления координат главной метки
@@ -38,10 +45,10 @@
     };
 
     var onMouseMove = function (moveEvt) {
-      var MAP_MIN_X = window.data.MapRect.LEFT - MainPinSize.RADIUS;
-      var MAP_MAX_X = window.data.MapRect.RIGHT - MainPinSize.RADIUS;
-      var MAP_MIN_Y = window.data.MapRect.TOP - MainPinSize.RADIUS;
-      var MAP_MAX_Y = window.data.MapRect.BOTTOM - MainPinSize.RADIUS;
+      var MAP_MIN_X = MapRect.LEFT - MainPinSize.RADIUS;
+      var MAP_MAX_X = MapRect.RIGHT - MainPinSize.RADIUS;
+      var MAP_MIN_Y = MapRect.TOP - MainPinSize.RADIUS;
+      var MAP_MAX_Y = MapRect.BOTTOM - MainPinSize.RADIUS;
 
       var shift = {
         x: startCoords.x - moveEvt.clientX,

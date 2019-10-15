@@ -141,6 +141,5 @@
   window.data = {
     ads: ads,
     offerTypeEnToRu: offerTypeEnToRu,
-    MapRect: MapRect,
   };
 })();
