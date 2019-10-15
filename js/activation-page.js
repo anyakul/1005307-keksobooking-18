@@ -17,9 +17,9 @@
   var activatePage = function () {
     window.domRef.map.classList.remove('map--faded');
     window.domRef.adForm.classList.remove('ad-form--disabled');
+    activateFields();
     window.adForm.renderAddressInput(window.mainPins.getMainPinCoords(window.mainPins.mainPinSize.HEIGHT));
     window.pins.renderPins(window.data.ads);
-    activateFields();
     window.mainPins.mainPin.removeEventListener('keydown', onMainPinEnterPress);
     window.mainPins.mainPin.removeEventListener('mousedown', onMainPinMouseDown);
     window.domRef.mapPins.addEventListener('click', window.card.onPinShowCard);
@@ -29,15 +29,16 @@
   var deactivatePage = function () {
     window.domRef.map.classList.add('map--faded');
     window.domRef.adForm.classList.add('ad-form--disabled');
+    window.domRef.adForm.reset();
+    window.domRef.filterForm.reset();
     window.adForm.renderAddressInput(window.mainPins.getMainPinCoords(window.mainPins.mainPinSize.RADIUS));
+    window.mainPins.setPinStartPosition();
     deactivateFields();
     window.mainPins.mainPin.addEventListener('keydown', onMainPinEnterPress);
     window.mainPins.mainPin.addEventListener('mousedown', onMainPinMouseDown);
     window.mainPins.mainPin.removeEventListener('click', window.card.onPinShow);
     window.pins.removePins();
     window.card.close();
-    window.domRef.adForm.reset();
-    window.domRef.filterForm.reset();
   };
 
   // Функция активации страницы по нажатию кнопки мышки на главную метку
