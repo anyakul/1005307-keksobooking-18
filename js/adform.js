@@ -8,7 +8,6 @@
     palace: 10000,
   };
 
-
   var adFormReset = window.domRef.adForm.querySelector('.ad-form__reset');
   var titleInput = window.domRef.adForm.querySelector('#title');
   var address = window.domRef.adForm.querySelector('#address');
@@ -99,7 +98,7 @@
 
   window.adForm = {
     address: address,
-    adFormReset: adFormReset,
     renderAddressInput: renderAddressInput,
+    adReset: adFormReset,
   };
 })();

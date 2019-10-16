@@ -4,9 +4,9 @@
   var USER_COUNT = 8;
 
   var MapRect = {
-    LEFT: 100,
+    LEFT: 50,
     TOP: 130,
-    RIGHT: 1200,
+    RIGHT: 1150,
     BOTTOM: 630,
   };
 

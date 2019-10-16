@@ -17,11 +17,10 @@
   var activatePage = function () {
     window.domRef.map.classList.remove('map--faded');
     window.domRef.adForm.classList.remove('ad-form--disabled');
-    window.adForm.renderAddressInput(window.mainPins.getMainPinCoords(window.mainPins.mainPinSize.HEIGHT));
-    window.pins.renderPins(window.data.ads);
     activateFields();
-    window.mainPins.mainPin.removeEventListener('keydown', onMainPinEnterPress);
-    window.mainPins.mainPin.removeEventListener('mousedown', onMainPinMouseDown);
+    window.pin.render(window.data.ads);
+    window.mainPin.pin.removeEventListener('keydown', onMainPinEnterPress);
+    window.mainPin.pin.removeEventListener('mousedown', onMainPinMouseDown);
     window.domRef.mapPins.addEventListener('click', window.card.onPinShowCard);
   };
 
@@ -29,15 +28,15 @@
   var deactivatePage = function () {
     window.domRef.map.classList.add('map--faded');
     window.domRef.adForm.classList.add('ad-form--disabled');
-    window.adForm.renderAddressInput(window.mainPins.getMainPinCoords(window.mainPins.mainPinSize.RADIUS));
-    deactivateFields();
-    window.mainPins.mainPin.addEventListener('keydown', onMainPinEnterPress);
-    window.mainPins.mainPin.addEventListener('mousedown', onMainPinMouseDown);
-    window.mainPins.mainPin.removeEventListener('click', window.card.onPinShow);
-    window.pins.removePins();
-    window.card.close();
     window.domRef.adForm.reset();
     window.domRef.filterForm.reset();
+    window.mainPin.setStartPosition(window.mainPin.initialCoords);
+    deactivateFields();
+    window.mainPin.pin.addEventListener('keydown', onMainPinEnterPress);
+    window.mainPin.pin.addEventListener('mousedown', onMainPinMouseDown);
+    window.mainPin.pin.removeEventListener('click', window.card.onPinShow);
+    window.pin.remove();
+    window.card.close();
   };
 
   // Функция активации страницы по нажатию кнопки мышки на главную метку
@@ -52,21 +51,25 @@
     }
   };
 
+  var onDomLoad = function () {
+    deactivatePage();
+  };
+
   // Функция деактивации страницы при нажатии на кнопку очистить
   var onFormResetClick = function () {
     deactivatePage();
   };
 
   // Обработчик события загрузка страницы
-  document.addEventListener('DOMContentLoaded', deactivatePage);
+  document.addEventListener('DOMContentLoaded', onDomLoad);
 
   // Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
-  window.mainPins.mainPin.addEventListener('mousedown', onMainPinMouseDown);
+  window.mainPin.pin.addEventListener('mousedown', onMainPinMouseDown);
 
   // Обработчик события переключения страницы с неактивного режима на активный при помощи клавиатуры
-  window.mainPins.mainPin.addEventListener('keydown', onMainPinEnterPress);
+  window.mainPin.pin.addEventListener('keydown', onMainPinEnterPress);
 
   // Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
-  window.adForm.adFormReset.addEventListener('click', onFormResetClick);
+  window.adForm.adReset.addEventListener('click', onFormResetClick);
 
 })();
