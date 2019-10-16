@@ -97,5 +97,6 @@
   window.mainPin = {
     pin: mainPin,
     setStartPosition: setPinStartPosition,
+    initialCoords: initialCoords,
   };
 })();
