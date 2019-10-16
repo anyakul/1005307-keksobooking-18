@@ -98,7 +98,7 @@
 
   window.adForm = {
     address: address,
-    adFormReset: adFormReset,
     renderAddressInput: renderAddressInput,
+    adReset: adFormReset,
   };
 })();

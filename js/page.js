@@ -19,8 +19,8 @@
     window.domRef.adForm.classList.remove('ad-form--disabled');
     activateFields();
     window.pin.render(window.data.ads);
-    window.mainPins.mainPin.removeEventListener('keydown', onMainPinEnterPress);
-    window.mainPins.mainPin.removeEventListener('mousedown', onMainPinMouseDown);
+    window.mainPin.pin.removeEventListener('keydown', onMainPinEnterPress);
+    window.mainPin.pin.removeEventListener('mousedown', onMainPinMouseDown);
     window.domRef.mapPins.addEventListener('click', window.card.onPinShowCard);
   };
 
@@ -30,11 +30,11 @@
     window.domRef.adForm.classList.add('ad-form--disabled');
     window.domRef.adForm.reset();
     window.domRef.filterForm.reset();
-    window.mainPins.setPinStartPosition();
+    window.mainPin.setStartPosition(window.mainPin.initialCoords);
     deactivateFields();
-    window.mainPins.mainPin.addEventListener('keydown', onMainPinEnterPress);
-    window.mainPins.mainPin.addEventListener('mousedown', onMainPinMouseDown);
-    window.mainPins.mainPin.removeEventListener('click', window.card.onPinShow);
+    window.mainPin.pin.addEventListener('keydown', onMainPinEnterPress);
+    window.mainPin.pin.addEventListener('mousedown', onMainPinMouseDown);
+    window.mainPin.pin.removeEventListener('click', window.card.onPinShow);
     window.pin.remove();
     window.card.close();
   };
@@ -51,21 +51,25 @@
     }
   };
 
+  var onDomLoad = function () {
+    deactivatePage();
+  };
+
   // Функция деактивации страницы при нажатии на кнопку очистить
   var onFormResetClick = function () {
     deactivatePage();
   };
 
   // Обработчик события загрузка страницы
-  document.addEventListener('DOMContentLoaded', deactivatePage);
+  document.addEventListener('DOMContentLoaded', onDomLoad);
 
   // Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
-  window.mainPins.mainPin.addEventListener('mousedown', onMainPinMouseDown);
+  window.mainPin.pin.addEventListener('mousedown', onMainPinMouseDown);
 
   // Обработчик события переключения страницы с неактивного режима на активный при помощи клавиатуры
-  window.mainPins.mainPin.addEventListener('keydown', onMainPinEnterPress);
+  window.mainPin.pin.addEventListener('keydown', onMainPinEnterPress);
 
   // Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
-  window.adForm.adFormReset.addEventListener('click', onFormResetClick);
+  window.adForm.adReset.addEventListener('click', onFormResetClick);
 
 })();

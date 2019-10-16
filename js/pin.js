@@ -40,5 +40,5 @@
   window.pin = {
     render: renderPins,
     remove: removePins,
-  }
+  };
 })();

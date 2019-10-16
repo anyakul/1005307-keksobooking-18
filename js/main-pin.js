@@ -7,9 +7,11 @@
     RADIUS: 32,
   };
 
-  var StartCoordinates = {
-    X: 570,
-    Y: 375
+  var mainPin = window.domRef.map.querySelector('.map__pin--main');
+
+  var initialCoords = {
+    x: mainPin.offsetLeft,
+    y: mainPin.offsetTop,
   };
 
   var MapRect = {
@@ -19,8 +21,6 @@
     BOTTOM: 630,
   };
 
-  var mainPin = window.domRef.map.querySelector('.map__pin--main');
-
   // Функция вычисления координат главной метки
   var getMainPinCoords = function (height) {
     return {
@@ -29,10 +29,14 @@
     };
   };
 
+  var renderMainPinPos = function (coords) {
+    mainPin.style.left = coords.x + 'px';
+    mainPin.style.top = coords.y + 'px';
+  };
+
   // Установка главного пина на старотвую позицию при деактивации страницы
   var setPinStartPosition = function () {
-    mainPin.style.left = StartCoordinates.X + 'px';
-    mainPin.style.top = StartCoordinates.Y + 'px';
+    renderMainPinPos(initialCoords);
     window.adForm.renderAddressInput(getMainPinCoords(MainPinSize.RADIUS));
   };
 
@@ -75,8 +79,7 @@
         offsetCoords.y = MAP_MAX_Y;
       }
 
-      mainPin.style.top = offsetCoords.y + 'px';
-      mainPin.style.left = offsetCoords.x + 'px';
+      renderMainPinPos(offsetCoords);
       window.adForm.renderAddressInput(getMainPinCoords(MainPinSize.HEIGHT));
     };
 
@@ -84,16 +87,15 @@
       upEvt.preventDefault();
 
       document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
       window.adForm.renderAddressInput(getMainPinCoords(MainPinSize.HEIGHT));
     };
 
     document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mouseup', onMouseUp, {once: true});
   });
 
-  window.mainPins = {
-    mainPin: mainPin,
-    setPinStartPosition: setPinStartPosition,
+  window.mainPin = {
+    pin: mainPin,
+    setStartPosition: setPinStartPosition,
   };
 })();
