@@ -4,6 +4,14 @@
   var FEATURE_MARKUP = '<li class="popup__feature popup__feature--$feature"></li>';
   var PHOTO_MARKUP = '<img src="$url" class="popup__photo" width="45" height="40" alt="Фотография жилья">';
 
+  // Словарь типов жилья
+  var offerTypeEnToRu = {
+    bungalo: 'Бунгало',
+    flat: 'Квартира',
+    house: 'Дом',
+    palace: 'Дворец',
+  };
+
   // Функция форматирования строки цены за ночь
   var formatOfferPrice = function (offer) {
     return offer.price + ' \u20bd/ночь';
@@ -11,7 +19,7 @@
 
   // Функция получения типа жилья на русском языке
   var getOfferType = function (offer) {
-    return window.data.offerTypeEnToRu[offer.type];
+    return offerTypeEnToRu[offer.type];
   };
 
   // Функция получения корректной формы слова комната.
@@ -63,7 +71,7 @@
     var card = window.domRef.cardTemplate.cloneNode(true);
     var offer = ad.offer;
 
-    card.querySelector('img').src = ad.avatar;
+    card.querySelector('img').src = ad.author.avatar;
     card.querySelector('.popup__title').textContent = offer.title;
     card.querySelector('.popup__text--address').textContent = offer.address;
     card.querySelector('.popup__text--price').textContent = formatOfferPrice(offer);
@@ -99,12 +107,16 @@
     }
   };
 
+  var loadCard = function () {
+    window.backend.load(showCard, window.util.onError);
+  };
+
   // Функция обработчика события показа карточки объявления
   var onPinShow = function (evt) {
     var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
     if (pin !== null) {
       closeCard();
-      showCard(window.data.ads[+pin.dataset.id]);
+      loadCard();
       pin.classList.add('map__pin--active');
     }
   };
@@ -127,7 +139,6 @@
   });
 
   window.card = {
-    onPinShow: onPinShow,
     close: closeCard,
   };
 })();

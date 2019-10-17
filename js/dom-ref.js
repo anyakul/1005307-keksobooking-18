@@ -8,6 +8,7 @@
   var notice = document.querySelector('.notice');
   var adForm = notice.querySelector('.ad-form');
   var adFields = adForm.querySelectorAll('fieldset');
+  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
   var pinsTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
@@ -26,5 +27,6 @@
     filterFields: filterFields,
     pinsTemplate: pinsTemplate,
     cardTemplate: cardTemplate,
+    errorTemplate: errorTemplate,
   };
 })();

@@ -46,6 +46,17 @@
     element.disabled = false;
   };
 
+  // Функция добавления шаблона в разметка
+  var addTemplate = function (elem, template) {
+    elem = template.cloneNode(true);
+    elem.appendChild(template);
+  };
+
+  // функция показа ошибки
+  var onError = function () {
+    addTemplate(window.domRef.errorTemplate);
+  };
+
   window.util = {
     setDisabled: setDisabled,
     unsetDisabled: unsetDisabled,
@@ -54,5 +65,7 @@
     isEscKey: isEscKey,
     pluralize: pluralize,
     removeElement: removeElement,
+    addTemplate: addTemplate,
+    onError: onError,
   };
 })();

@@ -12,7 +12,7 @@
     var pin = window.domRef.pinsTemplate.cloneNode(true);
     var pinImg = pin.querySelector('img');
 
-    pinImg.src = ad.avatar;
+    pinImg.src = ad.author.avatar;
     pin.style.left = (ad.location.x - PinSize.RADIUS) + 'px';
     pin.style.top = (ad.location.y - PinSize.HEIGHT) + 'px';
     pin.dataset.id = ad.id;
@@ -21,7 +21,7 @@
   };
 
   // Функция внеcения изменений в DOM - отметки на карте
-  var renderPins = function (ads) {
+  var showPins = function (ads) {
     var fragment = document.createDocumentFragment();
     ads.forEach(function (ad) {
       fragment.appendChild(renderPin(ad));
@@ -37,8 +37,14 @@
     }
   };
 
+  // Отображение пинов объявлений на карте с использованием данных с сервера
+  var loadPins = function () {
+    window.backend.load(showPins, window.util.onError);
+  };
+
   window.pin = {
-    render: renderPins,
+    show: showPins,
     remove: removePins,
+    load: loadPins,
   };
 })();

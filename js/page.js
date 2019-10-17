@@ -18,7 +18,7 @@
     window.domRef.map.classList.remove('map--faded');
     window.domRef.adForm.classList.remove('ad-form--disabled');
     activateFields();
-    window.pin.render(window.data.ads);
+    window.pin.load();
     window.mainPin.pin.removeEventListener('keydown', onMainPinEnterPress);
     window.mainPin.pin.removeEventListener('mousedown', onMainPinMouseDown);
     window.domRef.mapPins.addEventListener('click', window.card.onPinShowCard);
@@ -52,7 +52,7 @@
   };
 
   var onDomLoad = function () {
-    deactivatePage();
+    activatePage();
   };
 
   // Функция деактивации страницы при нажатии на кнопку очистить
