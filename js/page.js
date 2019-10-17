@@ -52,7 +52,7 @@
   };
 
   var onDomLoad = function () {
-    activatePage();
+    deactivatePage();
   };
 
   // Функция деактивации страницы при нажатии на кнопку очистить
