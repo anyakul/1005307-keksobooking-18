@@ -85,7 +85,7 @@
     return card;
   };
 
-  // Функция внеcения изменений в DOM - карточка объявления
+  // Функция показа карточки объявления
   var showCard = function (ad) {
     window.domRef.map.appendChild(renderCard(ad));
   };
@@ -107,6 +107,7 @@
     }
   };
 
+  // Функция загрузки карточки объявления из сервера
   var loadCard = function () {
     window.backend.load(showCard, window.util.onError);
   };
@@ -140,5 +141,7 @@
 
   window.card = {
     close: closeCard,
+    load: loadCard,
+    onPinShow: onPinShow,
   };
 })();

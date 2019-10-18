@@ -9,7 +9,7 @@
 
   // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
   var renderPin = function (ad) {
-    var pin = window.domRef.pinsTemplate.cloneNode(true);
+    var pin = window.domRef.pinTemplate.cloneNode(true);
     var pinImg = pin.querySelector('img');
 
     pinImg.src = ad.author.avatar;
@@ -25,6 +25,7 @@
     var fragment = document.createDocumentFragment();
     ads.forEach(function (ad) {
       fragment.appendChild(renderPin(ad));
+      window.domRef.mapPins.addEventListener('click', window.card.onPinShow);
     });
     window.domRef.mapPins.appendChild(fragment);
   };

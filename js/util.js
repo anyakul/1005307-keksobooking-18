@@ -38,15 +38,17 @@
     element.remove();
   };
 
+  // Функция блокировки элемента
   var setDisabled = function (element) {
     element.disabled = true;
   };
 
+  // Функция разблокировки элемента
   var unsetDisabled = function (element) {
     element.disabled = false;
   };
 
-  // Функция добавления шаблона в разметка
+  // Функция добавления шаблона в разметку
   var addTemplate = function (elem, template) {
     elem = template.cloneNode(true);
     elem.appendChild(template);
@@ -58,13 +60,13 @@
   };
 
   window.util = {
-    setDisabled: setDisabled,
-    unsetDisabled: unsetDisabled,
     isEnterKey: isEnterKey,
-    KeyboardKey: KeyboardKey,
     isEscKey: isEscKey,
     pluralize: pluralize,
     removeElement: removeElement,
+    setDisabled: setDisabled,
+    unsetDisabled: unsetDisabled,
+    KeyboardKey: KeyboardKey,
     addTemplate: addTemplate,
     onError: onError,
   };

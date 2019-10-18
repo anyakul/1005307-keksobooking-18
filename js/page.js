@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  // Функция удаления атрибута disabled всем элементам формы в активном состоянии
+  // Функция удаления атрибута disabled у всех элементов формы в активном состоянии
   var activateFields = function () {
     window.domRef.adFields.forEach(window.util.unsetDisabled);
     window.domRef.filterFields.forEach(window.util.unsetDisabled);
@@ -18,6 +18,7 @@
     window.domRef.map.classList.remove('map--faded');
     window.domRef.adForm.classList.remove('ad-form--disabled');
     activateFields();
+    window.adForm.renderAddressInput(window.mainPin.getMainPinCoords(window.mainPin.MainPinSize.HEIGHT));
     window.pin.load();
     window.mainPin.pin.removeEventListener('keydown', onMainPinEnterPress);
     window.mainPin.pin.removeEventListener('mousedown', onMainPinMouseDown);
@@ -32,6 +33,7 @@
     window.domRef.filterForm.reset();
     window.mainPin.setStartPosition(window.mainPin.initialCoords);
     deactivateFields();
+    window.adForm.renderAddressInput(window.mainPin.getMainPinCoords(window.mainPin.MainPinSize.RADIUS));
     window.mainPin.pin.addEventListener('keydown', onMainPinEnterPress);
     window.mainPin.pin.addEventListener('mousedown', onMainPinMouseDown);
     window.mainPin.pin.removeEventListener('click', window.card.onPinShow);
@@ -51,11 +53,13 @@
     }
   };
 
+  // Функция обработчика события загрузки страницы
   var onDomLoad = function () {
-    deactivatePage();
+    activatePage();
+    window.card.load();
   };
 
-  // Функция деактивации страницы при нажатии на кнопку очистить
+  // Функция обработчика события нажатие на кнопку очистить
   var onFormResetClick = function () {
     deactivatePage();
   };

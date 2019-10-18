@@ -6,7 +6,7 @@
   var STATUS_SUCCESS = 200;
 
   // Обращение к серверу и обработка возможных ошибок
-  var initXHR = function (onLoad, onError) {
+  var createRequest = function (onLoad, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
@@ -23,17 +23,17 @@
     });
 
     xhr.addEventListener('timeout', function () {
-      onError('Прeвышено время ожидания ответа от сайта. Запрос не успел выполниться за ' + xhr.timeout + 'мс');
+      onError('Прeвышено время ожидания ответа от сайта. Запрос не успел выполниться за ' + xhr.TIMEOUT + 'мс');
     });
 
-    xhr.timeout = 15000;
+    xhr.TIMEOUT = 15000;
 
     return xhr;
   };
 
   // Загрузка данных с сервера
   var load = function (onLoad, onError) {
-    var xhr = initXHR(onLoad, onError);
+    var xhr = createRequest(onLoad, onError);
     xhr.open('GET', DATA_URL);
     xhr.send();
   };
