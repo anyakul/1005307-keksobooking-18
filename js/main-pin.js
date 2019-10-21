@@ -1,27 +1,16 @@
 'use strict';
 
 (function () {
-  var MapRect = {
-    LEFT: 1,
-    TOP: 130,
-    RIGHT: 1200,
-    BOTTOM: 630,
-  };
-
-  var MainPinSize = {
-    WIDTH: 65,
-    HEIGHT: 80,
-    RADIUS: 32,
-  };
-
   var MainPinRect = {
-    LEFT: MapRect.LEFT - MainPinSize.RADIUS,
-    RIGHT: MapRect.RIGHT - MainPinSize.RADIUS,
-    TOP: MapRect.TOP - MainPinSize.HEIGHT,
-    BOTTOM: MapRect.BOTTOM - MainPinSize.HEIGHT,
+    LEFT: window.const.MapRect.LEFT - window.const.MainPinSize.RADIUS,
+    RIGHT: window.const.MapRect.RIGHT - window.const.MainPinSize.RADIUS,
+    TOP: window.const.MapRect.TOP - window.const.MainPinSize.HEIGHT,
+    BOTTOM: window.const.MapRect.BOTTOM - window.const.MainPinSize.HEIGHT,
   };
 
   var mainPin = window.domRef.map.querySelector('.map__pin--main');
+
+  var address = window.domRef.adForm.querySelector('#address');
 
   var initialCoords = {
     x: mainPin.offsetLeft,
@@ -31,7 +20,7 @@
   // Функция вычисления координат главной метки
   var getMainPinCoords = function (height) {
     return {
-      x: mainPin.offsetLeft + MainPinSize.RADIUS,
+      x: mainPin.offsetLeft + window.const.MainPinSize.RADIUS,
       y: mainPin.offsetTop + height
     };
   };
@@ -45,6 +34,22 @@
   // Функция становки главного пина на старотвую позицию при деактивации страницы
   var setPinStartPosition = function () {
     renderMainPinPos(initialCoords);
+  };
+
+  // Функция заполнения поля адреса по местоположению главной метки на карте
+  var renderAddressInput = function (coords) {
+    address.value = coords.x + ', ' + coords.y;
+  };
+
+  // Функция связанная с главной меткой вызывающаяся при деактивации страницы
+  var renderDeactivation = function () {
+    setPinStartPosition();
+    renderAddressInput(getMainPinCoords(window.const.MainPinSize.RADIUS));
+  };
+
+  // Функция связанная с главной меткой вызывающаяся при активации страницы
+  var renderActivation = function () {
+    renderAddressInput(getMainPinCoords(window.const.MainPinSize.HEIGHT));
   };
 
   var getMainPinOffset = function (x, y) {
@@ -67,13 +72,14 @@
       var y = startCoords.y + moveEvt.clientY - evt.clientY;
 
       renderMainPinPos(getMainPinOffset(x, y));
+      renderActivation();
     };
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
       document.removeEventListener('mousemove', onMouseMove);
-      window.adForm.renderAddressInput(getMainPinCoords(MainPinSize.HEIGHT));
+      renderActivation();
     };
 
     document.addEventListener('mousemove', onMouseMove);
@@ -81,10 +87,8 @@
   });
 
   window.mainPin = {
-    MainPinSize: MainPinSize,
     pin: mainPin,
-    initialCoords: initialCoords,
-    setStartPosition: setPinStartPosition,
-    getMainPinCoords: getMainPinCoords,
+    renderActivation: renderActivation,
+    renderDeactivation: renderDeactivation,
   };
 })();

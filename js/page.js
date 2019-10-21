@@ -3,8 +3,10 @@
 (function () {
   // Функция удаления атрибута disabled у всех элементов формы в активном состоянии
   var activateFields = function () {
-    window.domRef.adFields.forEach(window.util.unsetDisabled);
-    window.domRef.filterFields.forEach(window.util.unsetDisabled);
+    if (window.domRef.map.contains(window.domRef.mapPin)) {
+      window.domRef.adFields.forEach(window.util.unsetDisabled);
+      window.domRef.filterFields.forEach(window.util.unsetDisabled);
+    }
   };
 
   // Функция добавления атрибута disabled всем элементам формы в неактивном состоянии
@@ -18,11 +20,10 @@
     window.domRef.map.classList.remove('map--faded');
     window.domRef.adForm.classList.remove('ad-form--disabled');
     activateFields();
-    window.adForm.renderAddressInput(window.mainPin.getMainPinCoords(window.mainPin.MainPinSize.HEIGHT));
+    window.mainPin.renderActivation();
     window.pin.load();
     window.mainPin.pin.removeEventListener('keydown', onMainPinEnterPress);
     window.mainPin.pin.removeEventListener('mousedown', onMainPinMouseDown);
-    window.domRef.mapPins.addEventListener('click', window.card.onPinShowCard);
   };
 
   // Функция переключения страницы с активного режима на неактивный
@@ -31,12 +32,10 @@
     window.domRef.adForm.classList.add('ad-form--disabled');
     window.domRef.adForm.reset();
     window.domRef.filterForm.reset();
-    window.mainPin.setStartPosition(window.mainPin.initialCoords);
     deactivateFields();
-    window.adForm.renderAddressInput(window.mainPin.getMainPinCoords(window.mainPin.MainPinSize.RADIUS));
+    window.mainPin.renderDeactivation();
     window.mainPin.pin.addEventListener('keydown', onMainPinEnterPress);
     window.mainPin.pin.addEventListener('mousedown', onMainPinMouseDown);
-    window.mainPin.pin.removeEventListener('click', window.card.onPinShow);
     window.pin.remove();
     window.card.close();
   };
@@ -56,7 +55,6 @@
   // Функция обработчика события загрузки страницы
   var onDomLoad = function () {
     activatePage();
-    window.card.load();
   };
 
   // Функция обработчика события нажатие на кнопку очистить
@@ -74,6 +72,6 @@
   window.mainPin.pin.addEventListener('keydown', onMainPinEnterPress);
 
   // Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
-  window.adForm.adReset.addEventListener('click', onFormResetClick);
+  window.adForm.reset.addEventListener('click', onFormResetClick);
 
 })();

@@ -76,7 +76,7 @@
     card.querySelector('.popup__text--address').textContent = offer.address;
     card.querySelector('.popup__text--price').textContent = formatOfferPrice(offer);
     card.querySelector('.popup__type').textContent = getOfferType(offer);
-    card.querySelector('.popup__text--capacity').textContent = offer.rooms > 0 ? formatOfferCapacity(offer) : '';
+    card.querySelector('.popup__text--capacity').textContent = formatOfferCapacity(offer);
     card.querySelector('.popup__text--time').textContent = formatOfferTime(offer);
     card.querySelector('.popup__description').textContent = offer.description;
     card.querySelector('.popup__features').innerHTML = offer.features.length > 0 ? getFeatureTemplate(offer.features) : '';
@@ -142,6 +142,5 @@
   window.card = {
     close: closeCard,
     load: loadCard,
-    onPinShow: onPinShow,
   };
 })();

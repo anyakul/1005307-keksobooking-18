@@ -3,16 +3,18 @@
 (function () {
   var map = document.querySelector('.map');
   var mapPins = map.querySelector('.map__pins');
+  var mapPin = map.querySelector('.map__pins:not(.map__pin--main)');
   var filterForm = map.querySelector('.map__filters');
   var filterFields = map.querySelectorAll('.map__filter, .map__checkbox');
   var notice = document.querySelector('.notice');
   var adForm = notice.querySelector('.ad-form');
   var adFields = adForm.querySelectorAll('fieldset');
-  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
+  var errorTemplate = document.querySelector('#error')
+    .content
+    .querySelector('.error');
   var pinTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
-
   var cardTemplate = document.querySelector('#card')
     .content
     .querySelector('.map__card');
@@ -20,6 +22,7 @@
   window.domRef = {
     map: map,
     mapPins: mapPins,
+    mapPin: mapPin,
     notice: notice,
     adForm: adForm,
     adFields: adFields,

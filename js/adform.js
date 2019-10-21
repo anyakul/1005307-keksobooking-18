@@ -10,7 +10,6 @@
 
   var adFormReset = window.domRef.adForm.querySelector('.ad-form__reset');
   var titleInput = window.domRef.adForm.querySelector('#title');
-  var address = window.domRef.adForm.querySelector('#address');
   var roomNumber = window.domRef.adForm.querySelector('#room_number');
   var guestNumber = window.domRef.adForm.querySelector('#capacity');
   var priceInput = window.domRef.adForm.querySelector('#price');
@@ -29,11 +28,6 @@
     } else {
       titleInput.setCustomValidity('');
     }
-  };
-
-  // Функция заполнения поля адреса по местоположению главной метки на карте
-  var renderAddressInput = function (coords) {
-    address.value = coords.x + ', ' + coords.y;
   };
 
   // Функция установки установки типа жилья и минимальной цены за ночь
@@ -96,8 +90,6 @@
   });
 
   window.adForm = {
-    address: address,
-    renderAddressInput: renderAddressInput,
-    adReset: adFormReset,
+    reset: adFormReset,
   };
 })();

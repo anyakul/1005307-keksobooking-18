@@ -48,15 +48,10 @@
     element.disabled = false;
   };
 
-  // Функция добавления шаблона в разметку
-  var addTemplate = function (elem, template) {
-    elem = template.cloneNode(true);
-    elem.appendChild(template);
-  };
-
-  // функция показа ошибки
-  var onError = function () {
-    addTemplate(window.domRef.errorTemplate);
+  // Функция создания уведомления
+  var onNotice = function (template) {
+    var noticeElement = template.cloneNode(true);
+    window.domRef.map.appendChild(noticeElement);
   };
 
   window.util = {
@@ -67,7 +62,6 @@
     setDisabled: setDisabled,
     unsetDisabled: unsetDisabled,
     KeyboardKey: KeyboardKey,
-    addTemplate: addTemplate,
-    onError: onError,
+    onNotice: onNotice,
   };
 })();

@@ -4,6 +4,7 @@
   var URL = 'https://js.dump.academy/keksobooking';
   var DATA_URL = URL + '/data';
   var STATUS_SUCCESS = 200;
+  var TIMEOUT = 15000;
 
   // Обращение к серверу и обработка возможных ошибок
   var createRequest = function (onLoad, onError) {
@@ -23,10 +24,10 @@
     });
 
     xhr.addEventListener('timeout', function () {
-      onError('Прeвышено время ожидания ответа от сайта. Запрос не успел выполниться за ' + xhr.TIMEOUT + 'мс');
+      onError('Прeвышено время ожидания ответа от сайта. Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
 
-    xhr.TIMEOUT = 15000;
+    xhr.timeout = TIMEOUT;
 
     return xhr;
   };
