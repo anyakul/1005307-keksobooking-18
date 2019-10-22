@@ -17,6 +17,15 @@
   var timeOutSelect = window.domRef.adForm.querySelector('#timeout');
   var typeSelect = window.domRef.adForm.querySelector('#type');
 
+  var activateForm = function () {
+    window.domRef.adFields.forEach(window.util.unsetDisabled);
+  };
+
+  // Функция активации фильтров
+  var deactivateForm = function () {
+    window.domRef.adFields.forEach(window.util.setDisabled);
+  };
+
   // Функция проверки заголовка требованиям
   var validateTitle = function () {
     if (titleInput.validity.tooShort) {
@@ -91,5 +100,7 @@
 
   window.adForm = {
     reset: adFormReset,
+    activate: activateForm,
+    deactivate: deactivateForm,
   };
 })();

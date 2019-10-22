@@ -1,22 +1,13 @@
 'use strict';
 
 (function () {
-  var activateForm = function () {
-    window.domRef.adFields.forEach(window.util.unsetDisabled);
-  };
-
-  // Функция активации фильтров
-  var deactivateForm = function () {
-    window.domRef.adFields.forEach(window.util.setDisabled);
-  };
-
   // Функция переключения страницы с неактивного режима на активный
   var activatePage = function () {
     window.domRef.map.classList.remove('map--faded');
     window.domRef.adForm.classList.remove('ad-form--disabled');
     window.mainPin.renderActivation();
     window.pin.load();
-    activateForm();
+    window.adForm.activate();
     window.mainPin.pin.removeEventListener('keydown', onMainPinEnterPress);
     window.mainPin.pin.removeEventListener('mousedown', onMainPinMouseDown);
   };
@@ -25,8 +16,8 @@
   var deactivatePage = function () {
     window.domRef.map.classList.add('map--faded');
     window.domRef.adForm.classList.add('ad-form--disabled');
-    window.pin.deactivateFilters();
-    deactivateForm();
+    window.filter.deactivate();
+    window.adForm.deactivate();
     window.domRef.adForm.reset();
     window.domRef.filterForm.reset();
     window.mainPin.renderDeactivation();

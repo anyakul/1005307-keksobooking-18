@@ -2,17 +2,6 @@
 
 (function () {
   var errorBlock = null;
-
-  // Функция активации фильтров
-  var activateFilters = function () {
-    window.domRef.filterFields.forEach(window.util.unsetDisabled);
-  };
-
-  // Функция активации фильтров
-  var deactivateFilters = function () {
-    window.domRef.filterFields.forEach(window.util.setDisabled);
-  };
-
   // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
   var renderPin = function (ad) {
     var pin = window.domRef.pinTemplate.cloneNode(true);
@@ -37,7 +26,7 @@
 
   var removeErrorBlock = function () {
     errorBlock.remove();
-    deactivateFilters();
+    window.filter.deactivate();
     document.removeEventListener('click', onClickDocument);
     document.removeEventListener('keydown', onPushEsc);
   };
@@ -73,7 +62,7 @@
     if (ads.length > 0) {
       showPins(ads);
     }
-    activateFilters();
+    window.filter.activate();
   };
 
   // Отображение пинов объявлений на карте с использованием данных с сервера
@@ -84,7 +73,6 @@
   window.pin = {
     show: showPins,
     remove: removePins,
-    deactivateFilters: deactivateFilters,
     load: loadPins,
   };
 })();
