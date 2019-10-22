@@ -31,7 +31,7 @@
     mainPin.style.top = coords.y + 'px';
   };
 
-  // Функция становки главного пина на старотвую позицию при деактивации страницы
+  // Функция становки главного пина на стартовую позицию при деактивации страницы
   var setPinStartPosition = function () {
     renderMainPinPos(initialCoords);
   };
@@ -52,6 +52,7 @@
     renderAddressInput(getMainPinCoords(window.const.MainPinSize.HEIGHT));
   };
 
+  // Функция получения координат главной метки
   var getMainPinOffset = function (x, y) {
     return {
       x: Math.min(Math.max(x, MainPinRect.LEFT), MainPinRect.RIGHT),

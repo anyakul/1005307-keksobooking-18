@@ -24,6 +24,7 @@
     window.domRef.mapPins.appendChild(fragment);
   };
 
+  //функция закрытия блока с сообщением об ошибке
   var removeErrorBlock = function () {
     errorBlock.remove();
     window.filter.deactivate();
@@ -31,17 +32,19 @@
     document.removeEventListener('keydown', onPushEsc);
   };
 
+  // Функция обработчика события закрытия блока с сообщением об ошибке при нажатии кнопки мыши
   var onClickDocument = function () {
     removeErrorBlock();
   };
 
+  // Функция обработчика события закрытия блока с сообщением об ошибке при нажатии кнопки esc
   var onPushEsc = function () {
     if (window.util.isEscKey) {
       removeErrorBlock();
     }
   };
 
-  // функция показа ошибки
+  // функция показа сообщения об ошибке
   var onError = function () {
     window.domRef.errorTemplate.cloneNode(true);
     errorBlock = window.domRef.map.appendChild(window.domRef.errorTemplate);

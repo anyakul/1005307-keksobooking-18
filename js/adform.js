@@ -17,11 +17,12 @@
   var timeOutSelect = window.domRef.adForm.querySelector('#timeout');
   var typeSelect = window.domRef.adForm.querySelector('#type');
 
+  // Функция активации формы отправки объявления
   var activateForm = function () {
     window.domRef.adFields.forEach(window.util.unsetDisabled);
   };
 
-  // Функция активации фильтров
+  // Функция деактивации формы отправки объявления
   var deactivateForm = function () {
     window.domRef.adFields.forEach(window.util.setDisabled);
   };
