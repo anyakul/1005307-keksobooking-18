@@ -1,6 +1,20 @@
 'use strict';
 
 (function () {
+  var errorBlock = null;
+
+  // Функция активации фильтров
+  var activateFields = function () {
+    window.domRef.filterFields.forEach(window.util.unsetDisabled);
+    window.domRef.adFields.forEach(window.util.unsetDisabled);
+  };
+
+  // Функция активации фильтров
+  var deactivateFields = function () {
+    window.domRef.filterFields.forEach(window.util.setDisabled);
+    window.domRef.adFields.forEach(window.util.setDisabled);
+  };
+
   // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
   var renderPin = function (ad) {
     var pin = window.domRef.pinTemplate.cloneNode(true);
@@ -23,26 +37,30 @@
     window.domRef.mapPins.appendChild(fragment);
   };
 
-  var onCloseError = function () {
-    window.util.removeElement(window.domRef.errorTemplate);
+  var removeErrorBlock = function () {
+    errorBlock.remove();
+    errorBlock = null;
+    deactivateFields();
+    document.removeEventListener('click', onClickDocument);
+    document.removeEventListener('keydown', onPushEsc);
+  };
+
+  var onClickDocument = function () {
+    removeErrorBlock();
+  };
+
+  var onPushEsc = function () {
+    if (window.util.isEscKey) {
+      removeErrorBlock();
+    }
   };
 
   // функция показа ошибки
   var onError = function () {
-    window.domRef.map.appendChild(window.domRef.errorTemplate);
-    var errorButton = document.querySelector('.error__button');
-    errorButton.addEventListener('click', onCloseError);
-    document.addEventListener('keydown', function (evt) {
-      if (window.util.isEscKey(evt)) {
-        onCloseError();
-      }
-    });
-    document.addEventListener('click', function (evt) {
-      var errorMassage = evt.target.closest('.error__message');
-      if (errorMassage === null) {
-        onCloseError();
-      }
-    });
+    window.domRef.errorTemplate.cloneNode(true);
+    errorBlock = window.domRef.map.appendChild(window.domRef.errorTemplate);
+    document.addEventListener('mousedown', onClickDocument);
+    document.addEventListener('keydown', onPushEsc);
   };
 
   // Функция удаления пинов
@@ -53,10 +71,12 @@
     }
   };
 
+  // Функция загрузки пинов с сервера
   var onDataLoad = function (ads) {
     if (ads.length > 0) {
       showPins(ads);
     }
+    activateFields();
   };
 
   // Отображение пинов объявлений на карте с использованием данных с сервера
@@ -67,6 +87,7 @@
   window.pin = {
     show: showPins,
     remove: removePins,
+    deactivateFields: deactivateFields,
     load: loadPins,
   };
 })();

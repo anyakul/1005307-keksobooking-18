@@ -1,25 +1,10 @@
 'use strict';
 
 (function () {
-  // Функция удаления атрибута disabled у всех элементов формы в активном состоянии
-  var activateFields = function () {
-    if (window.domRef.map.contains(window.domRef.mapPin)) {
-      window.domRef.adFields.forEach(window.util.unsetDisabled);
-      window.domRef.filterFields.forEach(window.util.unsetDisabled);
-    }
-  };
-
-  // Функция добавления атрибута disabled всем элементам формы в неактивном состоянии
-  var deactivateFields = function () {
-    window.domRef.adFields.forEach(window.util.setDisabled);
-    window.domRef.filterFields.forEach(window.util.setDisabled);
-  };
-
   // Функция переключения страницы с неактивного режима на активный
   var activatePage = function () {
     window.domRef.map.classList.remove('map--faded');
     window.domRef.adForm.classList.remove('ad-form--disabled');
-    activateFields();
     window.mainPin.renderActivation();
     window.pin.load();
     window.mainPin.pin.removeEventListener('keydown', onMainPinEnterPress);
@@ -30,9 +15,9 @@
   var deactivatePage = function () {
     window.domRef.map.classList.add('map--faded');
     window.domRef.adForm.classList.add('ad-form--disabled');
+    window.pin.deactivateFields();
     window.domRef.adForm.reset();
     window.domRef.filterForm.reset();
-    deactivateFields();
     window.mainPin.renderDeactivation();
     window.mainPin.pin.addEventListener('keydown', onMainPinEnterPress);
     window.mainPin.pin.addEventListener('mousedown', onMainPinMouseDown);
@@ -54,7 +39,7 @@
 
   // Функция обработчика события загрузки страницы
   var onDomLoad = function () {
-    activatePage();
+    deactivatePage();
   };
 
   // Функция обработчика события нажатие на кнопку очистить
