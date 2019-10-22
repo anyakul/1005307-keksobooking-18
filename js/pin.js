@@ -4,15 +4,13 @@
   var errorBlock = null;
 
   // Функция активации фильтров
-  var activateFields = function () {
+  var activateFilters = function () {
     window.domRef.filterFields.forEach(window.util.unsetDisabled);
-    window.domRef.adFields.forEach(window.util.unsetDisabled);
   };
 
   // Функция активации фильтров
-  var deactivateFields = function () {
+  var deactivateFilters = function () {
     window.domRef.filterFields.forEach(window.util.setDisabled);
-    window.domRef.adFields.forEach(window.util.setDisabled);
   };
 
   // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
@@ -39,8 +37,7 @@
 
   var removeErrorBlock = function () {
     errorBlock.remove();
-    errorBlock = null;
-    deactivateFields();
+    deactivateFilters();
     document.removeEventListener('click', onClickDocument);
     document.removeEventListener('keydown', onPushEsc);
   };
@@ -87,7 +84,7 @@
   window.pin = {
     show: showPins,
     remove: removePins,
-    deactivateFields: deactivateFields,
+    deactivateFilters: deactivateFilters,
     load: loadPins,
   };
 })();
