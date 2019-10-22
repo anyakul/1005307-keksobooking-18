@@ -73,7 +73,7 @@
     if (ads.length > 0) {
       showPins(ads);
     }
-    activateFields();
+    activateFilters();
   };
 
   // Отображение пинов объявлений на карте с использованием данных с сервера
