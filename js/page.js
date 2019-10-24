@@ -52,13 +52,10 @@
   // Обработчик события загрузка страницы
   document.addEventListener('DOMContentLoaded', onDomLoad);
 
-  // Обработчик события переключения страницы с неактивного режима на активный при помощи мышки
-  window.mainPin.pin.addEventListener('mousedown', onMainPinMouseDown);
-
-  // Обработчик события переключения страницы с неактивного режима на активный при помощи клавиатуры
-  window.mainPin.pin.addEventListener('keydown', onMainPinEnterPress);
-
   // Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
   window.adForm.reset.addEventListener('click', onFormResetClick);
 
+  window.page = {
+    ads: [],
+  };
 })();
