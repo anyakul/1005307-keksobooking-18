@@ -10,13 +10,22 @@
 
   var adFormReset = window.domRef.adForm.querySelector('.ad-form__reset');
   var titleInput = window.domRef.adForm.querySelector('#title');
-  var address = window.domRef.adForm.querySelector('#address');
   var roomNumber = window.domRef.adForm.querySelector('#room_number');
   var guestNumber = window.domRef.adForm.querySelector('#capacity');
   var priceInput = window.domRef.adForm.querySelector('#price');
   var timeInSelect = window.domRef.adForm.querySelector('#timein');
   var timeOutSelect = window.domRef.adForm.querySelector('#timeout');
   var typeSelect = window.domRef.adForm.querySelector('#type');
+
+  // Функция активации формы отправки объявления
+  var activateForm = function () {
+    window.domRef.adFields.forEach(window.util.unsetDisabled);
+  };
+
+  // Функция деактивации формы отправки объявления
+  var deactivateForm = function () {
+    window.domRef.adFields.forEach(window.util.setDisabled);
+  };
 
   // Функция проверки заголовка требованиям
   var validateTitle = function () {
@@ -31,24 +40,18 @@
     }
   };
 
-  // Функция заполнения поля адреса по местоположению главной метки на карте
-  var renderAddressInput = function (coords) {
-    address.value = coords.x + ', ' + coords.y;
-  };
-
   // Функция установки установки типа жилья и минимальной цены за ночь
   var getOfferMinPrice = function () {
     return offerTypeToMinPrice[typeSelect.value];
   };
 
-  // Функция расстановки правильных плейсхолдеров, максимальной цены, и минимальной цены за сутки в зависимости
-  // от типа жилья
+  // Функция расстановки правильных плейсхолдеров и минимальной цены за сутки в зависимости от типа жилья
   var setOfferPrice = function (price) {
     priceInput.min = price;
     priceInput.placeholder = price;
   };
 
-  // Функция расстановки соответствия времени заезда и времени выезда
+  // Функции расстановки соответствия времени заезда и времени выезда
   var setTimeOutInput = function () {
     timeInSelect.value = timeOutSelect.value;
   };
@@ -57,7 +60,7 @@
     timeOutSelect.value = timeInSelect.value;
   };
 
-  // Функция установки соответствия количества гостей с количеством комнат.
+  // Функция проверки соответствия количества гостей и количества комнат.
   var validateRoomAndGuest = function () {
     if (roomNumber.value === '1' && guestNumber.value !== roomNumber.value) {
       guestNumber.setCustomValidity('В однокомнатную квартиру разместить можно только 1 гостя');
@@ -97,8 +100,8 @@
   });
 
   window.adForm = {
-    address: address,
-    renderAddressInput: renderAddressInput,
-    adReset: adFormReset,
+    reset: adFormReset,
+    activate: activateForm,
+    deactivate: deactivateForm,
   };
 })();

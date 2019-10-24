@@ -8,10 +8,12 @@
   var notice = document.querySelector('.notice');
   var adForm = notice.querySelector('.ad-form');
   var adFields = adForm.querySelectorAll('fieldset');
-  var pinsTemplate = document.querySelector('#pin')
+  var errorTemplate = document.querySelector('#error')
+    .content
+    .querySelector('.error');
+  var pinTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
-
   var cardTemplate = document.querySelector('#card')
     .content
     .querySelector('.map__card');
@@ -24,7 +26,8 @@
     adFields: adFields,
     filterForm: filterForm,
     filterFields: filterFields,
-    pinsTemplate: pinsTemplate,
+    pinTemplate: pinTemplate,
     cardTemplate: cardTemplate,
+    errorTemplate: errorTemplate,
   };
 })();

@@ -4,6 +4,14 @@
   var FEATURE_MARKUP = '<li class="popup__feature popup__feature--$feature"></li>';
   var PHOTO_MARKUP = '<img src="$url" class="popup__photo" width="45" height="40" alt="Фотография жилья">';
 
+  // Словарь типов жилья
+  var offerTypeEnToRu = {
+    bungalo: 'Бунгало',
+    flat: 'Квартира',
+    house: 'Дом',
+    palace: 'Дворец',
+  };
+
   // Функция форматирования строки цены за ночь
   var formatOfferPrice = function (offer) {
     return offer.price + ' \u20bd/ночь';
@@ -11,7 +19,7 @@
 
   // Функция получения типа жилья на русском языке
   var getOfferType = function (offer) {
-    return window.data.offerTypeEnToRu[offer.type];
+    return offerTypeEnToRu[offer.type];
   };
 
   // Функция получения корректной формы слова комната.
@@ -63,12 +71,12 @@
     var card = window.domRef.cardTemplate.cloneNode(true);
     var offer = ad.offer;
 
-    card.querySelector('img').src = ad.avatar;
+    card.querySelector('img').src = ad.author.avatar;
     card.querySelector('.popup__title').textContent = offer.title;
     card.querySelector('.popup__text--address').textContent = offer.address;
     card.querySelector('.popup__text--price').textContent = formatOfferPrice(offer);
     card.querySelector('.popup__type').textContent = getOfferType(offer);
-    card.querySelector('.popup__text--capacity').textContent = offer.rooms > 0 ? formatOfferCapacity(offer) : '';
+    card.querySelector('.popup__text--capacity').textContent = formatOfferCapacity(offer);
     card.querySelector('.popup__text--time').textContent = formatOfferTime(offer);
     card.querySelector('.popup__description').textContent = offer.description;
     card.querySelector('.popup__features').innerHTML = offer.features.length > 0 ? getFeatureTemplate(offer.features) : '';
@@ -77,57 +85,63 @@
     return card;
   };
 
-  // Функция внеcения изменений в DOM - карточка объявления
-  var showCard = function (ad) {
-    window.domRef.map.appendChild(renderCard(ad));
+  var setPinActive = function (pin, active) {
+    pin.classList[active ? 'add' : 'remove']('map__pin--active');
   };
 
   // функция удаления класса active
-  var removeClassActive = function () {
-    var pinActive = window.domRef.mapPins.querySelector('.map__pin--active:not(.map__pin--main)');
-    if (pinActive !== null) {
-      pinActive.classList.remove('map__pin--active');
+  var removePinActive = function () {
+    var activePin = window.domRef.mapPins.querySelector('.map__pin--active:not(.map__pin--main)');
+    if (activePin !== null) {
+      setPinActive(activePin, false);
+    }
+  };
+
+  var onCardCloseClick = function () {
+    closeCard();
+  };
+
+  var onCardEscPress = function (evt) {
+    if (window.util.isEscKey(evt)) {
+      closeCard();
     }
   };
 
   // Функция закрытия карточки объявления
   var closeCard = function () {
-    var pinPopup = document.querySelector('.map__card');
-    if (window.domRef.map.contains(pinPopup)) {
-      window.domRef.map.removeChild(pinPopup);
-      removeClassActive();
+    var card = window.domRef.map.querySelector('.map__card');
+    if (card !== null) {
+      card.remove();
+      removePinActive();
+      document.removeEventListener('keydown', onCardEscPress);
     }
   };
 
+  // Функция показа карточки объявления
+  var showCard = function (ad) {
+    var card = renderCard(ad);
+    // Обработчик события закрытие попапа с информацией об объявлении при клике на крестик
+    card.querySelector('.popup__close').addEventListener('click', onCardCloseClick);
+    // Обработчик события закрытие попапа с информацией об объявлении при нажатии ECS
+    document.addEventListener('keydown', onCardEscPress);
+
+    window.domRef.map.appendChild(card);
+  };
+
   // Функция обработчика события показа карточки объявления
-  var onPinShow = function (evt) {
+  var onMapClick = function (evt) {
     var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
     if (pin !== null) {
       closeCard();
-      showCard(window.data.ads[+pin.dataset.id]);
-      pin.classList.add('map__pin--active');
+      showCard(window.page.ads[+pin.dataset.id]);
+      setPinActive(pin, true);
     }
   };
 
   // Обработчик события открытия карточки объявления
-  window.domRef.mapPins.addEventListener('click', onPinShow);
-
-  // Обработчик события закрытие попапа с информацией об объявлении при нажатии ECS
-  document.addEventListener('keydown', function (evt) {
-    if (window.util.isEscKey(evt)) {
-      closeCard();
-    }
-  });
-
-  // Обработчик события закрытие попапа с информацией об объявлении при клике на крестик
-  document.addEventListener('click', function (evt) {
-    if (evt.target.matches('.popup__close')) {
-      closeCard();
-    }
-  });
+  window.domRef.mapPins.addEventListener('click', onMapClick);
 
   window.card = {
-    onPinShow: onPinShow,
     close: closeCard,
   };
 })();

@@ -1,93 +1,86 @@
 'use strict';
 
 (function () {
-  var MainPinSize = {
-    WIDTH: 65,
-    HEIGHT: 80,
-    RADIUS: 32,
+  var MainPinRect = {
+    LEFT: window.const.MapRect.LEFT - window.const.MainPinSize.RADIUS,
+    RIGHT: window.const.MapRect.RIGHT - window.const.MainPinSize.RADIUS,
+    TOP: window.const.MapRect.TOP - window.const.MainPinSize.HEIGHT,
+    BOTTOM: window.const.MapRect.BOTTOM - window.const.MainPinSize.HEIGHT,
   };
 
   var mainPin = window.domRef.map.querySelector('.map__pin--main');
+
+  var address = window.domRef.adForm.querySelector('#address');
 
   var initialCoords = {
     x: mainPin.offsetLeft,
     y: mainPin.offsetTop,
   };
 
-  var MapRect = {
-    LEFT: 50,
-    TOP: 130,
-    RIGHT: 1150,
-    BOTTOM: 630,
-  };
-
   // Функция вычисления координат главной метки
   var getMainPinCoords = function (height) {
     return {
-      x: mainPin.offsetLeft + MainPinSize.RADIUS,
+      x: mainPin.offsetLeft + window.const.MainPinSize.RADIUS,
       y: mainPin.offsetTop + height
     };
   };
 
+  // Функция изменения положения главной метки
   var renderMainPinPos = function (coords) {
     mainPin.style.left = coords.x + 'px';
     mainPin.style.top = coords.y + 'px';
   };
 
-  // Установка главного пина на старотвую позицию при деактивации страницы
+  // Функция становки главного пина на стартовую позицию при деактивации страницы
   var setPinStartPosition = function () {
     renderMainPinPos(initialCoords);
-    window.adForm.renderAddressInput(getMainPinCoords(MainPinSize.RADIUS));
+  };
+
+  // Функция заполнения поля адреса по местоположению главной метки на карте
+  var renderAddressInput = function (coords) {
+    address.value = coords.x + ', ' + coords.y;
+  };
+
+  // Функция связанная с главной меткой вызывающаяся при деактивации страницы
+  var renderDeactivation = function () {
+    setPinStartPosition();
+    renderAddressInput(getMainPinCoords(window.const.MainPinSize.RADIUS));
+  };
+
+  // Функция связанная с главной меткой вызывающаяся при активации страницы
+  var renderActivation = function () {
+    renderAddressInput(getMainPinCoords(window.const.MainPinSize.HEIGHT));
+  };
+
+  // Функция получения координат главной метки
+  var getMainPinOffset = function (x, y) {
+    return {
+      x: Math.min(Math.max(x, MainPinRect.LEFT), MainPinRect.RIGHT),
+      y: Math.min(Math.max(y, MainPinRect.TOP), MainPinRect.BOTTOM),
+    };
   };
 
   // функция вычисления координат главной метки после ее передвижения
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     var startCoords = {
-      x: evt.clientX,
-      y: evt.clientY
+      x: mainPin.offsetLeft,
+      y: mainPin.offsetTop,
     };
 
     var onMouseMove = function (moveEvt) {
-      var MAP_MIN_X = MapRect.LEFT - MainPinSize.RADIUS;
-      var MAP_MAX_X = MapRect.RIGHT - MainPinSize.RADIUS;
-      var MAP_MIN_Y = MapRect.TOP - MainPinSize.RADIUS;
-      var MAP_MAX_Y = MapRect.BOTTOM - MainPinSize.RADIUS;
+      var x = startCoords.x + moveEvt.clientX - evt.clientX;
+      var y = startCoords.y + moveEvt.clientY - evt.clientY;
 
-      var shift = {
-        x: startCoords.x - moveEvt.clientX,
-        y: startCoords.y - moveEvt.clientY
-      };
-
-      startCoords = {
-        x: moveEvt.clientX,
-        y: moveEvt.clientY
-      };
-
-      var offsetCoords = {
-        x: mainPin.offsetLeft - shift.x,
-        y: mainPin.offsetTop - shift.y
-      };
-
-      if (offsetCoords.x < MAP_MIN_X) {
-        offsetCoords.x = MAP_MIN_X;
-      } else if (offsetCoords.x > MAP_MAX_X) {
-        offsetCoords.x = MAP_MAX_X;
-      } else if (offsetCoords.y < MAP_MIN_Y) {
-        offsetCoords.y = MAP_MIN_Y;
-      } else if (offsetCoords.y > MAP_MAX_Y) {
-        offsetCoords.y = MAP_MAX_Y;
-      }
-
-      renderMainPinPos(offsetCoords);
-      window.adForm.renderAddressInput(getMainPinCoords(MainPinSize.HEIGHT));
+      renderMainPinPos(getMainPinOffset(x, y));
+      renderActivation();
     };
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
       document.removeEventListener('mousemove', onMouseMove);
-      window.adForm.renderAddressInput(getMainPinCoords(MainPinSize.HEIGHT));
+      renderActivation();
     };
 
     document.addEventListener('mousemove', onMouseMove);
@@ -96,7 +89,7 @@
 
   window.mainPin = {
     pin: mainPin,
-    setStartPosition: setPinStartPosition,
-    initialCoords: initialCoords,
+    renderActivation: renderActivation,
+    renderDeactivation: renderDeactivation,
   };
 })();

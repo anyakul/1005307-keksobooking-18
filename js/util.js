@@ -38,21 +38,22 @@
     element.remove();
   };
 
+  // Функция блокировки элемента
   var setDisabled = function (element) {
     element.disabled = true;
   };
 
+  // Функция разблокировки элемента
   var unsetDisabled = function (element) {
     element.disabled = false;
   };
 
   window.util = {
-    setDisabled: setDisabled,
-    unsetDisabled: unsetDisabled,
     isEnterKey: isEnterKey,
-    KeyboardKey: KeyboardKey,
     isEscKey: isEscKey,
     pluralize: pluralize,
     removeElement: removeElement,
+    setDisabled: setDisabled,
+    unsetDisabled: unsetDisabled,
   };
 })();
