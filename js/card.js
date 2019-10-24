@@ -85,62 +85,63 @@
     return card;
   };
 
-  // Функция показа карточки объявления
-  var onDataLoad = function (ad) {
-    window.domRef.map.appendChild(renderCard(ad));
+  var setPinActive = function (pin, active) {
+    pin.classList[active ? 'add' : 'remove']('map__pin--active');
   };
 
   // функция удаления класса active
-  var removeClassActive = function () {
-    var pinActive = window.domRef.mapPins.querySelector('.map__pin--active:not(.map__pin--main)');
-    if (pinActive !== null) {
-      pinActive.classList.remove('map__pin--active');
+  var removePinActive = function () {
+    var activePin = window.domRef.mapPins.querySelector('.map__pin--active:not(.map__pin--main)');
+    if (activePin !== null) {
+      setPinActive(activePin, false);
+    }
+  };
+
+  var onCardCloseClick = function (evt) {
+    closeCard();
+  };
+
+  var onCardEscPress = function (evt) {
+    if (window.util.isEscKey(evt)) {
+      closeCard();
     }
   };
 
   // Функция закрытия карточки объявления
   var closeCard = function () {
-    var pinPopup = document.querySelector('.map__card');
-    if (window.domRef.map.contains(pinPopup)) {
-      window.domRef.map.removeChild(pinPopup);
-      removeClassActive();
+    var card = window.domRef.map.querySelector('.map__card');
+    if (card !== null) {
+      card.remove();
+      removePinActive();
+      document.removeEventListener('keydown', onCardEscPress);
     }
   };
 
-  // Функция загрузки карточки объявления из сервера
-  var loadCard = function () {
-    window.backend.load(onDataLoad, window.pin.onDataLoadError);
+  // Функция показа карточки объявления
+  var showCard = function (ad) {
+    var card = renderCard(ad);
+    // Обработчик события закрытие попапа с информацией об объявлении при клике на крестик
+    card.querySelector('.popup__close').addEventListener('click', onCardCloseClick);
+    // Обработчик события закрытие попапа с информацией об объявлении при нажатии ECS
+    document.addEventListener('keydown', onCardEscPress);
+
+    window.domRef.map.appendChild(card);
   };
 
   // Функция обработчика события показа карточки объявления
-  var onPinShow = function (evt) {
+  var onMapClick = function (evt) {
     var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
     if (pin !== null) {
       closeCard();
-      loadCard();
-      pin.classList.add('map__pin--active');
+      showCard(window.page.ads[+pin.dataset.id]);
+      setPinActive(pin, true);
     }
   };
 
   // Обработчик события открытия карточки объявления
-  window.domRef.mapPins.addEventListener('click', onPinShow);
-
-  // Обработчик события закрытие попапа с информацией об объявлении при нажатии ECS
-  document.addEventListener('keydown', function (evt) {
-    if (window.util.isEscKey(evt)) {
-      closeCard();
-    }
-  });
-
-  // Обработчик события закрытие попапа с информацией об объявлении при клике на крестик
-  document.addEventListener('click', function (evt) {
-    if (evt.target.matches('.popup__close')) {
-      closeCard();
-    }
-  });
+  window.domRef.mapPins.addEventListener('click', onMapClick);
 
   window.card = {
     close: closeCard,
-    load: loadCard,
   };
 })();
