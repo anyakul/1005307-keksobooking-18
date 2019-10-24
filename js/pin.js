@@ -45,10 +45,17 @@
     }
   };
 
+  var normalizeAds = function (ad, idx) {
+    ad.id = idx;
+    return ad;
+  };
+
   // Функция загрузки пинов с сервера
   var onDataLoad = function (ads) {
     if (ads.length > 0) {
-      showPins(ads);
+      window.page.ads = ads.map(normalizeAds);
+
+      showPins(window.page.ads);
       window.filter.activate();
     }
   };
