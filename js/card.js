@@ -97,7 +97,7 @@
     }
   };
 
-  var onCardCloseClick = function (evt) {
+  var onCardCloseClick = function () {
     closeCard();
   };
 
