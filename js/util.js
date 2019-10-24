@@ -48,12 +48,6 @@
     element.disabled = false;
   };
 
-  // Функция создания уведомления
-  var onNotice = function (template) {
-    var noticeElement = template.cloneNode(true);
-    window.domRef.map.appendChild(noticeElement);
-  };
-
   window.util = {
     isEnterKey: isEnterKey,
     isEscKey: isEscKey,
@@ -61,7 +55,5 @@
     removeElement: removeElement,
     setDisabled: setDisabled,
     unsetDisabled: unsetDisabled,
-    KeyboardKey: KeyboardKey,
-    onNotice: onNotice,
   };
 })();

@@ -2,6 +2,7 @@
 
 (function () {
   var errorBlock = null;
+
   // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
   var renderPin = function (ad) {
     var pin = window.domRef.pinTemplate.cloneNode(true);
@@ -24,32 +25,41 @@
     window.domRef.mapPins.appendChild(fragment);
   };
 
-  //функция закрытия блока с сообщением об ошибке
+  // Функция закрытия блока с сообщением об ошибке
   var removeErrorBlock = function () {
     errorBlock.remove();
-    window.filter.deactivate();
-    document.removeEventListener('click', onClickDocument);
-    document.removeEventListener('keydown', onPushEsc);
+    errorBlock = null;
+    document.removeEventListener('mousedown', onDocumentClick);
+    document.removeEventListener('keydown', onEscPress);
   };
 
   // Функция обработчика события закрытия блока с сообщением об ошибке при нажатии кнопки мыши
-  var onClickDocument = function () {
+  var onDocumentClick = function () {
     removeErrorBlock();
   };
 
   // Функция обработчика события закрытия блока с сообщением об ошибке при нажатии кнопки esc
-  var onPushEsc = function () {
-    if (window.util.isEscKey) {
+  var onEscPress = function (evt) {
+    if (window.util.isEscKey(evt)) {
       removeErrorBlock();
     }
   };
 
-  // функция показа сообщения об ошибке
-  var onError = function () {
-    window.domRef.errorTemplate.cloneNode(true);
-    errorBlock = window.domRef.map.appendChild(window.domRef.errorTemplate);
-    document.addEventListener('mousedown', onClickDocument);
-    document.addEventListener('keydown', onPushEsc);
+  // Функция загрузки пинов с сервера
+  var onDataLoad = function (ads) {
+    if (ads.length > 0) {
+      showPins(ads);
+      window.filter.activate();
+    }
+  };
+
+  // Функция показа сообщения об ошибке
+  var onDataLoadError = function (errorMessage) {
+    errorBlock = window.domRef.errorTemplate.cloneNode(true);
+    window.domRef.map.appendChild(errorBlock);
+    errorBlock.querySelector('.error__message').textContent = errorMessage;
+    document.addEventListener('mousedown', onDocumentClick);
+    document.addEventListener('keydown', onEscPress);
   };
 
   // Функция удаления пинов
@@ -60,17 +70,9 @@
     }
   };
 
-  // Функция загрузки пинов с сервера
-  var onDataLoad = function (ads) {
-    if (ads.length > 0) {
-      showPins(ads);
-    }
-    window.filter.activate();
-  };
-
   // Отображение пинов объявлений на карте с использованием данных с сервера
   var loadPins = function () {
-    window.backend.load(onDataLoad, onError);
+    window.backend.load(onDataLoad, onDataLoadError);
   };
 
   window.pin = {

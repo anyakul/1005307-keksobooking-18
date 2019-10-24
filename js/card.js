@@ -86,7 +86,7 @@
   };
 
   // Функция показа карточки объявления
-  var showCard = function (ad) {
+  var onDataLoad = function (ad) {
     window.domRef.map.appendChild(renderCard(ad));
   };
 
@@ -109,7 +109,7 @@
 
   // Функция загрузки карточки объявления из сервера
   var loadCard = function () {
-    window.backend.load(showCard, window.util.onError);
+    window.backend.load(onDataLoad, window.pin.onDataLoadError);
   };
 
   // Функция обработчика события показа карточки объявления
