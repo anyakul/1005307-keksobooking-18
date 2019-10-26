@@ -5,7 +5,7 @@
 
   // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
   var renderPin = function (ad) {
-    var pin = pinTemplate.cloneNode(true);
+    var pin = window.domRef.pinTemplate.cloneNode(true);
     var pinImg = pin.querySelector('img');
 
     pinImg.src = ad.author.avatar;
