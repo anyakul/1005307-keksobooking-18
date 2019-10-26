@@ -41,16 +41,11 @@
 
   // Функция обработчика события загрузки страницы
   var onDomLoad = function () {
-    deactivatePage();
+    activatePage();
   };
 
   // Функция обработчика события нажатие на кнопку очистить
   var onFormResetClick = function () {
-    deactivatePage();
-  };
-
-  var onSendForm = function (evt) {
-    window.adForm.send(evt);
     deactivatePage();
   };
 
@@ -60,10 +55,8 @@
   // Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
   window.adForm.reset.addEventListener('click', onFormResetClick);
 
-  // Обработчик события отправки формы
-  window.domRef.adForm.addEventListener('submit', onSendForm);
-
   window.page = {
     ads: [],
+    deactivate: deactivatePage,
   };
 })();

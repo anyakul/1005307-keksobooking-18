@@ -117,12 +117,19 @@
     evt.preventDefault();
     window.backend.save(new FormData(window.domRef.adForm), onDataSaveSuccess, onDataSaveError);
   };
+  
+  var onSendForm = function (evt) {
+    sendForm(evt);
+    window.page.deactivate();
+  };
+
+  // Обработчик события отправки формы
+  window.domRef.adForm.addEventListener('submit', onSendForm);
 
   window.adForm = {
     reset: adFormReset,
     activate: activateForm,
     deactivate: deactivateForm,
-    send: sendForm,
     address: address,
   };
 })();
