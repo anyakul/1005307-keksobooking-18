@@ -50,7 +50,8 @@
 
   // Функция обработчика показа ошибки сервера
   var onDataLoadError = function (errorMessage) {
-    window.message.showError(errorMessage);
+    window.domRef.messageTemplate.error.querySelector('.error__message').textContent = errorMessage;
+    window.message.showError();
   };
 
   // Отображение пинов объявлений на карте с использованием данных с сервера

@@ -102,13 +102,14 @@
   });
 
   // функция успешной отправки формы
-  var onDataSaveError = function (errorMessage) {
-    window.message.showError(errorMessage);
-  };
-
-  // функция неуспешной отправки формы
   var onDataSaveSuccess = function () {
     window.message.showSuccess();
+  };
+
+  // Функция обработчика показа ошибки сервера
+  var onDataSaveError = function (errorMessage) {
+    window.domRef.messageTemplate.error.querySelector('.error__message').textContent = errorMessage;
+    window.message.showError();
   };
 
   // Функция добавления нового пина при отправке формы из формы

@@ -3,11 +3,6 @@
 (function () {
   var messageBlock = null;
 
-  var messageTemplate = {
-    error: document.querySelector('#error').content.querySelector('.error'),
-    success: document.querySelector('#success').content.querySelector('.success'),
-  };
-
   // Функция закрытия блока с сообщением
   var removeMessageBlock = function () {
     messageBlock.remove();
@@ -35,21 +30,21 @@
   };
 
   // Функция показа окна с сообщением об ошибке
-  var showErrorMessage = function (errorMessage) {
-    messageBlock = messageTemplate.error.cloneNode(true);
+  var showErrorMessage = function () {
+    messageBlock = window.domRef.messageTemplate.error.cloneNode(true);
     window.domRef.map.appendChild(messageBlock);
-    messageBlock.querySelector('.error__message').textContent = errorMessage;
     getEventListener();
   };
 
   // Функция показа окна с сообщением об успешной отправке формы
   var showSuccessMessage = function () {
-    messageBlock = messageTemplate.success.cloneNode(true);
+    messageBlock = window.domRef.messageTemplate.success.cloneNode(true);
     window.domRef.map.appendChild(messageBlock);
     getEventListener();
   };
 
   window.message = {
+    block: messageBlock,
     showError: showErrorMessage,
     showSuccess: showSuccessMessage,
   };
