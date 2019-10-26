@@ -10,8 +10,6 @@
 
   var mainPin = window.domRef.map.querySelector('.map__pin--main');
 
-  var address = window.domRef.adForm.querySelector('#address');
-
   var initialCoords = {
     x: mainPin.offsetLeft,
     y: mainPin.offsetTop,
@@ -31,14 +29,14 @@
     mainPin.style.top = coords.y + 'px';
   };
 
-  // Функция становки главного пина на стартовую позицию при деактивации страницы
+  // Функция установки главного пина на стартовую позицию при деактивации страницы
   var setPinStartPosition = function () {
     renderMainPinPos(initialCoords);
   };
 
   // Функция заполнения поля адреса по местоположению главной метки на карте
   var renderAddressInput = function (coords) {
-    address.value = coords.x + ', ' + coords.y;
+    window.adForm.address.value = coords.x + ', ' + coords.y;
   };
 
   // Функция связанная с главной меткой вызывающаяся при деактивации страницы

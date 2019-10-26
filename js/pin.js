@@ -1,11 +1,11 @@
 'use strict';
 
 (function () {
-  var errorBlock = null;
+  var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
 
   // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
   var renderPin = function (ad) {
-    var pin = window.domRef.pinTemplate.cloneNode(true);
+    var pin = pinTemplate.cloneNode(true);
     var pinImg = pin.querySelector('img');
 
     pinImg.src = ad.author.avatar;
@@ -16,33 +16,13 @@
     return pin;
   };
 
-  // Функция внеcения изменений в DOM - отметки на карте
+  // Функция показа пинов на карте
   var showPins = function (ads) {
     var fragment = document.createDocumentFragment();
     ads.forEach(function (ad) {
       fragment.appendChild(renderPin(ad));
     });
     window.domRef.mapPins.appendChild(fragment);
-  };
-
-  // Функция закрытия блока с сообщением об ошибке
-  var removeErrorBlock = function () {
-    errorBlock.remove();
-    errorBlock = null;
-    document.removeEventListener('mousedown', onDocumentClick);
-    document.removeEventListener('keydown', onEscPress);
-  };
-
-  // Функция обработчика события закрытия блока с сообщением об ошибке при нажатии кнопки мыши
-  var onDocumentClick = function () {
-    removeErrorBlock();
-  };
-
-  // Функция обработчика события закрытия блока с сообщением об ошибке при нажатии кнопки esc
-  var onEscPress = function (evt) {
-    if (window.util.isEscKey(evt)) {
-      removeErrorBlock();
-    }
   };
 
   var normalizeAds = function (ad, idx) {
@@ -60,21 +40,17 @@
     }
   };
 
-  // Функция показа сообщения об ошибке
-  var onDataLoadError = function (errorMessage) {
-    errorBlock = window.domRef.errorTemplate.cloneNode(true);
-    window.domRef.map.appendChild(errorBlock);
-    errorBlock.querySelector('.error__message').textContent = errorMessage;
-    document.addEventListener('mousedown', onDocumentClick);
-    document.addEventListener('keydown', onEscPress);
-  };
-
   // Функция удаления пинов
   var removePins = function () {
     var pins = window.domRef.mapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
     if (pins !== null) {
       pins.forEach(window.util.removeElement);
     }
+  };
+
+  // Функция обработчика показа ошибки сервера
+  var onDataLoadError = function (errorMessage) {
+    window.message.showError(errorMessage);
   };
 
   // Отображение пинов объявлений на карте с использованием данных с сервера

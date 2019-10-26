@@ -6,8 +6,8 @@
     window.domRef.map.classList.remove('map--faded');
     window.domRef.adForm.classList.remove('ad-form--disabled');
     window.mainPin.renderActivation();
-    window.pin.load();
     window.adForm.activate();
+    window.pin.load();
     window.mainPin.pin.removeEventListener('keydown', onMainPinEnterPress);
     window.mainPin.pin.removeEventListener('mousedown', onMainPinMouseDown);
   };
@@ -49,11 +49,19 @@
     deactivatePage();
   };
 
+  var onSendForm = function (evt) {
+    window.adForm.send(evt);
+    deactivatePage();
+  };
+
   // Обработчик события загрузка страницы
   document.addEventListener('DOMContentLoaded', onDomLoad);
 
   // Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
   window.adForm.reset.addEventListener('click', onFormResetClick);
+
+  // Обработчик события отправки формы
+  window.domRef.adForm.addEventListener('submit', onSendForm);
 
   window.page = {
     ads: [],

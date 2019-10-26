@@ -12,6 +12,8 @@
     palace: 'Дворец',
   };
 
+  var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
+
   // Функция форматирования строки цены за ночь
   var formatOfferPrice = function (offer) {
     return offer.price + ' \u20bd/ночь';
@@ -68,7 +70,7 @@
 
   // Функция для создания карточки объявления
   var renderCard = function (ad) {
-    var card = window.domRef.cardTemplate.cloneNode(true);
+    var card = cardTemplate.cloneNode(true);
     var offer = ad.offer;
 
     card.querySelector('img').src = ad.author.avatar;
