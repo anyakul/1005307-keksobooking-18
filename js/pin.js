@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-  var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
 
   // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
   var renderPin = function (ad) {
