@@ -113,13 +113,9 @@
   };
 
   // Функция добавления нового пина при отправке формы из формы
-  var sendForm = function (evt) {
+  var onSendForm = function (evt) {
     evt.preventDefault();
     window.backend.save(new FormData(window.domRef.adForm), onDataSaveSuccess, onDataSaveError);
-  };
-  
-  var onSendForm = function (evt) {
-    sendForm(evt);
     window.page.deactivate();
   };
 
