@@ -44,7 +44,6 @@
   };
 
   window.message = {
-    block: messageBlock,
     showError: showErrorMessage,
     showSuccess: showSuccessMessage,
   };
