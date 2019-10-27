@@ -104,6 +104,7 @@
   // функция успешной отправки формы
   var onDataSaveSuccess = function () {
     window.message.showSuccess();
+    window.page.deactivate();
   };
 
   // Функция обработчика показа ошибки сервера
@@ -116,7 +117,6 @@
   var onSendForm = function (evt) {
     evt.preventDefault();
     window.backend.save(new FormData(window.domRef.adForm), onDataSaveSuccess, onDataSaveError);
-    window.page.deactivate();
   };
 
   // Обработчик события отправки формы
