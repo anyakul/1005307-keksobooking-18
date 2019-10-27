@@ -108,8 +108,7 @@
   };
 
   // Функция обработчика показа ошибки сервера
-  var onDataSaveError = function (errorMessage) {
-    window.domRef.messageTemplate.error.querySelector('.error__message').textContent = errorMessage;
+  var onDataSaveError = function () {
     window.message.showError();
   };
 
