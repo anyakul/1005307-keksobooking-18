@@ -32,14 +32,22 @@
     return xhr;
   };
 
-  // Загрузка данных с сервера
+  // Функция загрузки данных с сервера
   var load = function (onLoad, onError) {
     var xhr = createRequest(onLoad, onError);
     xhr.open('GET', DATA_URL);
     xhr.send();
   };
 
+  // Функция передачи данных серверу
+  var save = function (data, onLoad, onError) {
+    var xhr = createRequest(onLoad, onError);
+    xhr.open('POST', URL);
+    xhr.send(data);
+  };
+
   window.backend = {
     load: load,
+    save: save,
   };
 })();

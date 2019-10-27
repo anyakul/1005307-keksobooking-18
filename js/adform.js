@@ -8,8 +8,10 @@
     palace: 10000,
   };
 
+  var adFields = window.domRef.adForm.querySelectorAll('fieldset');
   var adFormReset = window.domRef.adForm.querySelector('.ad-form__reset');
   var titleInput = window.domRef.adForm.querySelector('#title');
+  var address = window.domRef.adForm.querySelector('#address');
   var roomNumber = window.domRef.adForm.querySelector('#room_number');
   var guestNumber = window.domRef.adForm.querySelector('#capacity');
   var priceInput = window.domRef.adForm.querySelector('#price');
@@ -19,12 +21,12 @@
 
   // Функция активации формы отправки объявления
   var activateForm = function () {
-    window.domRef.adFields.forEach(window.util.unsetDisabled);
+    adFields.forEach(window.util.unsetDisabled);
   };
 
   // Функция деактивации формы отправки объявления
   var deactivateForm = function () {
-    window.domRef.adFields.forEach(window.util.setDisabled);
+    adFields.forEach(window.util.setDisabled);
   };
 
   // Функция проверки заголовка требованиям
@@ -99,9 +101,30 @@
     validateRoomAndGuest();
   });
 
+  // функция успешной отправки формы
+  var onDataSaveSuccess = function () {
+    window.message.showSuccess();
+    window.page.deactivate();
+  };
+
+  // Функция обработчика показа ошибки сервера
+  var onDataSaveError = function () {
+    window.message.showError();
+  };
+
+  // Функция добавления нового пина при отправке формы из формы
+  var onSendForm = function (evt) {
+    evt.preventDefault();
+    window.backend.save(new FormData(window.domRef.adForm), onDataSaveSuccess, onDataSaveError);
+  };
+
+  // Обработчик события отправки формы
+  window.domRef.adForm.addEventListener('submit', onSendForm);
+
   window.adForm = {
     reset: adFormReset,
     activate: activateForm,
     deactivate: deactivateForm,
+    address: address,
   };
 })();

@@ -6,8 +6,8 @@
     window.domRef.map.classList.remove('map--faded');
     window.domRef.adForm.classList.remove('ad-form--disabled');
     window.mainPin.renderActivation();
-    window.pin.load();
     window.adForm.activate();
+    window.pin.load();
     window.mainPin.pin.removeEventListener('keydown', onMainPinEnterPress);
     window.mainPin.pin.removeEventListener('mousedown', onMainPinMouseDown);
   };
@@ -57,5 +57,6 @@
 
   window.page = {
     ads: [],
+    deactivate: deactivatePage,
   };
 })();
