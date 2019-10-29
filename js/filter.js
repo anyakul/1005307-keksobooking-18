@@ -19,7 +19,7 @@
   var filterHousingType = function (ad) {
     return housingType.value === 'any' || ad.offer.type === housingType.value;
   };
-  
+
   // Функция коллбэк фильтрации элементов массива
   var filterAds = function (ad) {
     return filterHousingType(ad);
