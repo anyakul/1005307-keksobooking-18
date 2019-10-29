@@ -1,8 +1,8 @@
 'use strict';
 
 (function () {
+  var PIN_COUNT = 5;
   var filterFields = window.domRef.filterForm.querySelectorAll('.map__filter, .map__checkbox');
-  var PINS_COUNT = 5;
   var housingType = window.domRef.filterForm.querySelector('#housing-type');
 
   // Функция деактивации фильтров
@@ -16,27 +16,27 @@
   };
 
   // Функция проверки для каждого элемента массива на основе значения фильтра типа жилья
-  var getHousingType = function (item) {
-    if (housingType.value === 'any') {
-      return true;
-    }
-    return item.offer.type === housingType.value;
+  var filterHousingType = function (ad) {
+    return housingType.value === 'any' || ad.offer.type === housingType.value;
+  };
+  
+  // Функция коллбэк фильтрации элементов массива
+  var filterAds = function (ad) {
+    return filterHousingType(ad);
   };
 
   // Функция фильтрации элементов массива
-  var filterAll = function () {
+  var getFilteredAds = function () {
     return window.page.ads
-    .filter(function (item) {
-      return getHousingType(item);
-    })
-    .slice(0, PINS_COUNT);
+    .filter(filterAds)
+    .slice(0, PIN_COUNT);
   };
 
   // Обработчик, закрывает объявления, убирает пины и создает новые на основе требований фильтра
   var onFilterChange = window.debounce(function () {
     window.card.close();
     window.pin.remove();
-    window.pin.show(filterAll());
+    window.pin.show(getFilteredAds());
   });
 
   // Обработчик события изменения значения фильтра типа жилья
@@ -45,6 +45,6 @@
   window.filter = {
     deactivate: deactivateFilters,
     activate: activateFilters,
-    all: filterAll,
+    update: getFilteredAds,
   };
 })();

@@ -5,9 +5,9 @@
   // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
   var renderPin = function (ad) {
     var pin = window.domRef.pinTemplate.cloneNode(true);
-    var pinImg = pin.querySelector('img');
+    var pinImage = pin.querySelector('img');
 
-    pinImg.src = ad.author.avatar;
+    pinImage.src = ad.author.avatar;
     pin.style.left = (ad.location.x - window.const.PinSize.RADIUS) + 'px';
     pin.style.top = (ad.location.y - window.const.PinSize.HEIGHT) + 'px';
     pin.dataset.id = ad.id;
@@ -33,7 +33,7 @@
   var onDataLoad = function (ads) {
     if (ads.length > 0) {
       window.page.ads = ads.map(normalizeAds);
-      showPins(window.filter.all());
+      showPins(window.filter.update());
       window.filter.activate();
     }
   };
