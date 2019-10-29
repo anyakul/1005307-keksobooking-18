@@ -46,7 +46,7 @@
 
   var makeMessage = function (type) {
     return function showMessage(message) {
-      messageBlock = window.domRef.messageTemplate[type].cloneNode(true);
+      messageBlock = window.domRef.messageToTemplate[type].cloneNode(true);
       if (message) {
         messageBlock.querySelector('.' + type + '__message').textContent = message;
       }
