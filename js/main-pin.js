@@ -1,11 +1,24 @@
 'use strict';
 
 (function () {
+  var MapRect = {
+    LEFT: 0,
+    TOP: 130,
+    RIGHT: 1200,
+    BOTTOM: 630,
+  };
+
+  var MainPinSize = {
+    WIDTH: 65,
+    HEIGHT: 80,
+    RADIUS: 32,
+  };
+
   var MainPinRect = {
-    LEFT: window.const.MapRect.LEFT - window.const.MainPinSize.RADIUS,
-    RIGHT: window.const.MapRect.RIGHT - window.const.MainPinSize.RADIUS,
-    TOP: window.const.MapRect.TOP - window.const.MainPinSize.HEIGHT,
-    BOTTOM: window.const.MapRect.BOTTOM - window.const.MainPinSize.HEIGHT,
+    LEFT: MapRect.LEFT - MainPinSize.RADIUS,
+    RIGHT: MapRect.RIGHT - MainPinSize.RADIUS,
+    TOP: MapRect.TOP - MainPinSize.HEIGHT,
+    BOTTOM: MapRect.BOTTOM - MainPinSize.HEIGHT,
   };
 
   var mainPin = window.domRef.map.querySelector('.map__pin--main');
@@ -18,8 +31,8 @@
   // Функция вычисления координат главной метки
   var getMainPinCoords = function (height) {
     return {
-      x: mainPin.offsetLeft + window.const.MainPinSize.RADIUS,
-      y: mainPin.offsetTop + height
+      x: mainPin.offsetLeft + MainPinSize.RADIUS,
+      y: mainPin.offsetTop + height,
     };
   };
 
@@ -33,7 +46,7 @@
     renderMainPinPos(initialCoords);
     mainPin.addEventListener('keydown', onMainPinEnterPress);
     mainPin.addEventListener('mousedown', onMainPinMouseDown);
-    window.mainPin.onReset(getMainPinCoords(window.const.MainPinSize.RADIUS));
+    window.mainPin.onReset(getMainPinCoords(MainPinSize.RADIUS));
   };
 
   var onMainPinMouseDown = function () {
@@ -64,14 +77,14 @@
       y: mainPin.offsetTop,
     };
 
-    window.mainPin.onMove(getMainPinCoords(window.const.MainPinSize.HEIGHT));
+    window.mainPin.onMove(getMainPinCoords(MainPinSize.HEIGHT));
 
     var onMouseMove = function (moveEvt) {
       var x = startCoords.x + moveEvt.clientX - evt.clientX;
       var y = startCoords.y + moveEvt.clientY - evt.clientY;
 
       renderMainPinPos(getMainPinOffset(x, y));
-      window.mainPin.onMove(getMainPinCoords(window.const.MainPinSize.HEIGHT));
+      window.mainPin.onMove(getMainPinCoords(MainPinSize.HEIGHT));
     };
 
     var onMouseUp = function (upEvt) {
