@@ -29,25 +29,23 @@
     mainPin.style.top = coords.y + 'px';
   };
 
-  // Функция установки главного пина на стартовую позицию при деактивации страницы
-  var setPinStartPosition = function () {
+  var resetPin = function () {
     renderMainPinPos(initialCoords);
+    mainPin.addEventListener('keydown', onMainPinEnterPress);
+    mainPin.addEventListener('mousedown', onMainPinMouseDown);
+    window.mainPin.onReset(getMainPinCoords(window.const.MainPinSize.RADIUS));
   };
 
-  // Функция заполнения поля адреса по местоположению главной метки на карте
-  var renderAddressInput = function (coords) {
-    window.adForm.address.value = coords.x + ', ' + coords.y;
+  var onMainPinMouseDown = function () {
+    mainPin.removeEventListener('keydown', onMainPinEnterPress);
+    mainPin.removeEventListener('mousedown', onMainPinMouseDown);
+    window.mainPin.onFirstClick();
   };
 
-  // Функция связанная с главной меткой вызывающаяся при деактивации страницы
-  var renderDeactivation = function () {
-    setPinStartPosition();
-    renderAddressInput(getMainPinCoords(window.const.MainPinSize.RADIUS));
-  };
-
-  // Функция связанная с главной меткой вызывающаяся при активации страницы
-  var renderActivation = function () {
-    renderAddressInput(getMainPinCoords(window.const.MainPinSize.HEIGHT));
+  var onMainPinEnterPress = function (evt) {
+    if (window.util.isEnterKey(evt)) {
+      window.mainPin.onFirstClick();
+    }
   };
 
   // Функция получения координат главной метки
@@ -66,19 +64,20 @@
       y: mainPin.offsetTop,
     };
 
+    window.mainPin.onMove(getMainPinCoords(window.const.MainPinSize.HEIGHT));
+
     var onMouseMove = function (moveEvt) {
       var x = startCoords.x + moveEvt.clientX - evt.clientX;
       var y = startCoords.y + moveEvt.clientY - evt.clientY;
 
       renderMainPinPos(getMainPinOffset(x, y));
-      renderActivation();
+      window.mainPin.onMove(getMainPinCoords(window.const.MainPinSize.HEIGHT));
     };
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
       document.removeEventListener('mousemove', onMouseMove);
-      renderActivation();
     };
 
     document.addEventListener('mousemove', onMouseMove);
@@ -86,8 +85,9 @@
   });
 
   window.mainPin = {
-    pin: mainPin,
-    renderActivation: renderActivation,
-    renderDeactivation: renderDeactivation,
+    reset: resetPin,
+    onFirstClick: window.util.noop,
+    onReset: window.util.noop,
+    onMove: window.util.noop,
   };
 })();

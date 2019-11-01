@@ -36,6 +36,11 @@
     resetPictures();
   };
 
+  // Функция заполнения поля адреса по местоположению главной метки на карте
+  var renderAddressInput = function (coords) {
+    address.value = coords.x + ', ' + coords.y;
+  };
+
   // Функция проверки заголовка требованиям
   var validateTitle = function () {
     if (titleInput.validity.tooShort) {
@@ -147,6 +152,14 @@
 
   // Обработчик события отправки формы
   window.domRef.adForm.addEventListener('submit', onSendForm);
+
+  window.mainPin.onReset = function (coords) {
+    renderAddressInput(coords);
+  };
+
+  window.mainPin.onMove = function (coords) {
+    renderAddressInput(coords);
+  };
 
   window.adForm = {
     reset: adFormReset,
