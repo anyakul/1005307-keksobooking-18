@@ -2,7 +2,7 @@
 
 (function () {
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
-  
+
   var PhotoSize = {
     WIDTH: 70,
     HEIGHT: 70,
