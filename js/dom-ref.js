@@ -4,8 +4,6 @@
   var map = document.querySelector('.map');
   var mapPins = map.querySelector('.map__pins');
   var filterForm = map.querySelector('.map__filters');
-  var notice = document.querySelector('.notice');
-  var adForm = notice.querySelector('.ad-form');
   var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
   var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
   var messageToTemplate = {
@@ -17,7 +15,6 @@
     map: map,
     mapPins: mapPins,
     filterForm: filterForm,
-    adForm: adForm,
     pinTemplate: pinTemplate,
     cardTemplate: cardTemplate,
     messageToTemplate: messageToTemplate,

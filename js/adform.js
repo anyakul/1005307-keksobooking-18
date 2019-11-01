@@ -3,6 +3,25 @@
 (function () {
   var PREVIEW_IMG = 'img/muffin-grey.svg';
 
+  var adForm = document.querySelector('.ad-form');
+
+  var adFields = adForm.querySelectorAll('fieldset');
+  var adFormReset = adForm.querySelector('.ad-form__reset');
+  var fileChooserAvatar = adForm.querySelector('.ad-form__field input[type=file]');
+  var previewAvatar = adForm.querySelector('.ad-form-header__preview img');
+  var titleInput = adForm.querySelector('#title');
+  var address = adForm.querySelector('#address');
+  var roomNumber = adForm.querySelector('#room_number');
+  var guestNumber = adForm.querySelector('#capacity');
+  var priceInput = adForm.querySelector('#price');
+  var timeField = adForm.querySelector('.ad-form__element--time');
+  var timeInSelect = adForm.querySelector('#timein');
+  var timeOutSelect = adForm.querySelector('#timeout');
+
+  var typeSelect = adForm.querySelector('#type');
+  var fileChooserPhotoHouse = adForm.querySelector('.ad-form__upload input[type=file]');
+  var previewPhotoHouse = adForm.querySelector('.ad-form__photo');
+
   var offerTypeToMinPrice = {
     bungalo: 0,
     flat: 1000,
@@ -10,29 +29,17 @@
     palace: 10000,
   };
 
-  var adFields = window.domRef.adForm.querySelectorAll('fieldset');
-  var adFormReset = window.domRef.adForm.querySelector('.ad-form__reset');
-  var fileChooserAvatar = window.domRef.adForm.querySelector('.ad-form__field input[type=file]');
-  var previewAvatar = window.domRef.adForm.querySelector('.ad-form-header__preview img');
-  var titleInput = window.domRef.adForm.querySelector('#title');
-  var address = window.domRef.adForm.querySelector('#address');
-  var roomNumber = window.domRef.adForm.querySelector('#room_number');
-  var guestNumber = window.domRef.adForm.querySelector('#capacity');
-  var priceInput = window.domRef.adForm.querySelector('#price');
-  var timeInSelect = window.domRef.adForm.querySelector('#timein');
-  var timeOutSelect = window.domRef.adForm.querySelector('#timeout');
-  var typeSelect = window.domRef.adForm.querySelector('#type');
-  var fileChooserPhotoHouse = window.domRef.adForm.querySelector('.ad-form__upload input[type=file]');
-  var previewPhotoHouse = window.domRef.adForm.querySelector('.ad-form__photo');
-
   // Функция активации формы отправки объявления
   var activateForm = function () {
+    adForm.classList.remove('ad-form--disabled');
     adFields.forEach(window.util.unsetDisabled);
   };
 
   // Функция деактивации формы отправки объявления
   var deactivateForm = function () {
+    adForm.classList.add('ad-form--disabled');
     adFields.forEach(window.util.setDisabled);
+    adForm.reset();
     resetPictures();
   };
 
@@ -65,15 +72,6 @@
     priceInput.placeholder = price;
   };
 
-  // Функции расстановки соответствия времени заезда и времени выезда
-  var setTimeOutInput = function () {
-    timeInSelect.value = timeOutSelect.value;
-  };
-
-  var setTimeInInput = function () {
-    timeOutSelect.value = timeInSelect.value;
-  };
-
   // Функция проверки соответствия количества гостей и количества комнат.
   var validateRoomAndGuest = function () {
     var rooms = +roomNumber.value;
@@ -98,6 +96,18 @@
     window.fileInput.remove(previewPhotoHouse);
   };
 
+  // Функции расстановки соответствия времени заезда и времени выезда
+  var syncTime = function (time) {
+    timeInSelect.value = time;
+    timeOutSelect.value = time;
+  };
+
+  var onTimeChange = function (evt) {
+    syncTime(evt.target.value);
+  };
+
+  timeField.addEventListener('change', onTimeChange);
+
   // Обработчик события загрузки аватара
   fileChooserAvatar.addEventListener('change', function () {
     window.fileInput.add(fileChooserAvatar, true, previewAvatar);
@@ -116,15 +126,6 @@
   // Обработчик события установки плейсхолдеров и минимальной цены
   typeSelect.addEventListener('change', function (evt) {
     setOfferPrice(getOfferMinPrice(evt.target.value));
-  });
-
-  // Обработчик события установки соответствия времени заезда и выезда
-  timeInSelect.addEventListener('change', function () {
-    setTimeInInput();
-  });
-
-  timeOutSelect.addEventListener('change', function () {
-    setTimeOutInput();
   });
 
   guestNumber.addEventListener('change', function () {
@@ -150,11 +151,19 @@
   // Функция добавления нового пина при отправке формы из формы
   var onSendForm = function (evt) {
     evt.preventDefault();
-    window.backend.save(new FormData(window.domRef.adForm), onDataSaveSuccess, onDataSaveError);
+    window.backend.save(new FormData(adForm), onDataSaveSuccess, onDataSaveError);
+  };
+
+  // Функция обработчика события нажатие на кнопку очистить
+  var onFormResetClick = function () {
+    window.page.deactivate();
   };
 
   // Обработчик события отправки формы
-  window.domRef.adForm.addEventListener('submit', onSendForm);
+  adForm.addEventListener('submit', onSendForm);
+
+  // Обработчик события переключения страницы с активного режима на неактивный при сбросе формы
+  adFormReset.addEventListener('click', onFormResetClick);
 
   window.mainPin.onReset = function (coords) {
     renderAddressInput(coords);
@@ -165,9 +174,7 @@
   };
 
   window.adForm = {
-    reset: adFormReset,
     activate: activateForm,
     deactivate: deactivateForm,
-    address: address,
   };
 })();
