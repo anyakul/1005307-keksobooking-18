@@ -1,6 +1,11 @@
 'use strict';
 
 (function () {
+  var PinSize = {
+    WIDTH: 70,
+    HEIGHT: 50,
+    RADIUS: 25,
+  };
 
   // Функция для создания по шаблону будуших DOM-элементов, соответствующих меткам на карте
   var renderPin = function (ad) {
@@ -9,8 +14,8 @@
 
     pinImage.src = ad.author.avatar;
     pinImage.alt = ad.offer.title;
-    pin.style.left = (ad.location.x - window.const.PinSize.RADIUS) + 'px';
-    pin.style.top = (ad.location.y - window.const.PinSize.HEIGHT) + 'px';
+    pin.style.left = (ad.location.x - PinSize.RADIUS) + 'px';
+    pin.style.top = (ad.location.y - PinSize.HEIGHT) + 'px';
     pin.dataset.id = ad.id;
 
     return pin;
