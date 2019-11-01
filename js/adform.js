@@ -42,7 +42,7 @@
     }
   };
 
-  // Функция установки установки типа жилья и минимальной цены за ночь
+  // Функция установки типа жилья и минимальной цены за ночь
   var getOfferMinPrice = function () {
     return offerTypeToMinPrice[typeSelect.value];
   };
