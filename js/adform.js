@@ -22,8 +22,8 @@
   var timeInSelect = window.domRef.adForm.querySelector('#timein');
   var timeOutSelect = window.domRef.adForm.querySelector('#timeout');
   var typeSelect = window.domRef.adForm.querySelector('#type');
-  var fileChooserHouse = window.domRef.adForm.querySelector('.ad-form__upload input[type=file]');
-  var previewHouse = window.domRef.adForm.querySelector('.ad-form__photo');
+  var fileChooserPhotoHouse = window.domRef.adForm.querySelector('.ad-form__upload input[type=file]');
+  var previewPhotoHouse = window.domRef.adForm.querySelector('.ad-form__photo');
 
   // Функция активации формы отправки объявления
   var activateForm = function () {
@@ -87,7 +87,7 @@
   // Функция сброса изображений
   var resetPictures = function () {
     previewAvatar.src = PREVIEW_IMG;
-    window.fileInput.remove(previewHouse);
+    window.fileInput.remove(previewPhotoHouse);
   };
 
   // Обработчик события загрузки аватара
@@ -96,8 +96,8 @@
   });
 
   // Обработчик события загрузки фото жилья
-  fileChooserHouse.addEventListener('change', function () {
-    window.fileInput.add(fileChooserHouse, false, previewHouse);
+  fileChooserPhotoHouse.addEventListener('change', function () {
+    window.fileInput.add(fileChooserPhotoHouse, false, previewPhotoHouse);
   });
 
   // Обработчик события проверки соответствия заголовка требованиям
