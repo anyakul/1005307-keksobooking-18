@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var PREVIEW_IMG = 'img/muffin-grey.svg';
+
   var offerTypeToMinPrice = {
     bungalo: 0,
     flat: 1000,
@@ -10,6 +12,8 @@
 
   var adFields = window.domRef.adForm.querySelectorAll('fieldset');
   var adFormReset = window.domRef.adForm.querySelector('.ad-form__reset');
+  var fileChooserAvatar = window.domRef.adForm.querySelector('.ad-form__field input[type=file]');
+  var previewAvatar = window.domRef.adForm.querySelector('.ad-form-header__preview img');
   var titleInput = window.domRef.adForm.querySelector('#title');
   var address = window.domRef.adForm.querySelector('#address');
   var roomNumber = window.domRef.adForm.querySelector('#room_number');
@@ -18,6 +22,8 @@
   var timeInSelect = window.domRef.adForm.querySelector('#timein');
   var timeOutSelect = window.domRef.adForm.querySelector('#timeout');
   var typeSelect = window.domRef.adForm.querySelector('#type');
+  var fileChooserHouse = window.domRef.adForm.querySelector('.ad-form__upload input[type=file]');
+  var previewHouse = window.domRef.adForm.querySelector('.ad-form__photo');
 
   // Функция активации формы отправки объявления
   var activateForm = function () {
@@ -27,6 +33,7 @@
   // Функция деактивации формы отправки объявления
   var deactivateForm = function () {
     adFields.forEach(window.util.setDisabled);
+    resetPictures();
   };
 
   // Функция проверки заголовка требованиям
@@ -77,6 +84,22 @@
     }
   };
 
+  // Функция сброса изображений
+  var resetPictures = function () {
+    previewAvatar.src = PREVIEW_IMG;
+    window.fileInput.remove(previewHouse);
+  };
+
+  // Обработчик события загрузки аватара
+  fileChooserAvatar.addEventListener('change', function () {
+    window.fileInput.add(fileChooserAvatar, true, previewAvatar);
+  });
+
+  // Обработчик события загрузки фото жилья
+  fileChooserHouse.addEventListener('change', function () {
+    window.fileInput.add(fileChooserHouse, false, previewHouse);
+  });
+
   // Обработчик события проверки соответствия заголовка требованиям
   titleInput.addEventListener('blur', function () {
     validateTitle();
@@ -96,10 +119,15 @@
     setTimeOutInput();
   });
 
+  guestNumber.addEventListener('change', function () {
+    validateRoomAndGuest();
+  });
+
   // Обработчик события проверки соответствия количества комнат и гостей
   roomNumber.addEventListener('change', function () {
     validateRoomAndGuest();
   });
+
 
   // функция успешной отправки формы
   var onDataSaveSuccess = function () {
