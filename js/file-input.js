@@ -2,6 +2,11 @@
 
 (function () {
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+  
+  var PhotoSize = {
+    WIDTH: 70,
+    HEIGHT: 70,
+  };
 
   var addPhoto = function (fileChooser, isPreview, preview) {
     var file = fileChooser.files[0];
@@ -15,13 +20,13 @@
       var reader = new FileReader();
 
       reader.addEventListener('load', function () {
-        if (isPreview === true) {
+        if (isPreview) {
           preview.src = reader.result;
         } else {
           var newPreview = document.createElement('img');
           newPreview.src = reader.result;
-          newPreview.width = 70;
-          newPreview.height = 70;
+          newPreview.width = PhotoSize.WIDTH;
+          newPreview.height = PhotoSize.HEIGHT;
           newPreview.alt = 'Фото жилья';
           preview.insertBefore(newPreview, preview.children[preview.children.length - 1]);
         }
