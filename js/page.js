@@ -13,7 +13,6 @@
     window.domRef.map.classList.add('map--faded');
     window.filter.deactivate();
     window.adForm.deactivate();
-    window.domRef.filterForm.reset();
     window.mainPin.reset();
     window.pin.remove();
     window.card.close();

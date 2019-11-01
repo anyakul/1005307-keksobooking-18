@@ -7,12 +7,13 @@
     MAX: 50000,
   };
 
-  var filterFields = window.domRef.filterForm.querySelectorAll('.map__filter, .map__checkbox');
-  var housingType = window.domRef.filterForm.querySelector('#housing-type');
-  var housingPrice = window.domRef.filterForm.querySelector('#housing-price');
-  var housingRooms = window.domRef.filterForm.querySelector('#housing-rooms');
-  var housingGuests = window.domRef.filterForm.querySelector('#housing-guests');
-  var housingFeatures = window.domRef.filterForm.querySelector('#housing-features');
+  var filterForm = window.domRef.map.querySelector('.map__filters');
+  var filterFields = filterForm.querySelectorAll('.map__filter, .map__checkbox');
+  var housingType = filterForm.querySelector('#housing-type');
+  var housingPrice = filterForm.querySelector('#housing-price');
+  var housingRooms = filterForm.querySelector('#housing-rooms');
+  var housingGuests = filterForm.querySelector('#housing-guests');
+  var housingFeatures = filterForm.querySelector('#housing-features');
   var checkedFeatures = housingFeatures.querySelectorAll('input[type=checkbox]:checked');
 
   var priceToFilter = {
@@ -30,6 +31,7 @@
   // Функция деактивации фильтров
   var deactivateFilters = function () {
     filterFields.forEach(window.util.setDisabled);
+    filterForm.reset();
   };
 
   // Функция активации фильтров
@@ -100,7 +102,7 @@
   var onDebouncedFilterChange = window.debounce(onFilterChange);
 
   // Обработчик события изменения значения фильтров
-  window.domRef.filterForm.addEventListener('change', onDebouncedFilterChange);
+  filterForm.addEventListener('change', onDebouncedFilterChange);
 
   window.filter = {
     deactivate: deactivateFilters,
