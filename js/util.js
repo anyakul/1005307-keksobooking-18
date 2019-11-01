@@ -48,6 +48,9 @@
     element.disabled = false;
   };
 
+  // no operation
+  var noop = function () {};
+
   window.util = {
     isEnterKey: isEnterKey,
     isEscKey: isEscKey,
@@ -55,5 +58,6 @@
     removeElement: removeElement,
     setDisabled: setDisabled,
     unsetDisabled: unsetDisabled,
+    noop: noop,
   };
 })();

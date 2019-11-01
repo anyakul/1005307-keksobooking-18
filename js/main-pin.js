@@ -1,11 +1,24 @@
 'use strict';
 
 (function () {
+  var MapRect = {
+    LEFT: 0,
+    TOP: 130,
+    RIGHT: 1200,
+    BOTTOM: 630,
+  };
+
+  var MainPinSize = {
+    WIDTH: 65,
+    HEIGHT: 80,
+    RADIUS: 32,
+  };
+
   var MainPinRect = {
-    LEFT: window.const.MapRect.LEFT - window.const.MainPinSize.RADIUS,
-    RIGHT: window.const.MapRect.RIGHT - window.const.MainPinSize.RADIUS,
-    TOP: window.const.MapRect.TOP - window.const.MainPinSize.HEIGHT,
-    BOTTOM: window.const.MapRect.BOTTOM - window.const.MainPinSize.HEIGHT,
+    LEFT: MapRect.LEFT - MainPinSize.RADIUS,
+    RIGHT: MapRect.RIGHT - MainPinSize.RADIUS,
+    TOP: MapRect.TOP - MainPinSize.HEIGHT,
+    BOTTOM: MapRect.BOTTOM - MainPinSize.HEIGHT,
   };
 
   var mainPin = window.domRef.map.querySelector('.map__pin--main');
@@ -18,8 +31,8 @@
   // Функция вычисления координат главной метки
   var getMainPinCoords = function (height) {
     return {
-      x: mainPin.offsetLeft + window.const.MainPinSize.RADIUS,
-      y: mainPin.offsetTop + height
+      x: mainPin.offsetLeft + MainPinSize.RADIUS,
+      y: mainPin.offsetTop + height,
     };
   };
 
@@ -29,25 +42,23 @@
     mainPin.style.top = coords.y + 'px';
   };
 
-  // Функция установки главного пина на стартовую позицию при деактивации страницы
-  var setPinStartPosition = function () {
+  var resetPin = function () {
     renderMainPinPos(initialCoords);
+    mainPin.addEventListener('keydown', onMainPinEnterPress);
+    mainPin.addEventListener('mousedown', onMainPinMouseDown);
+    window.mainPin.onReset(getMainPinCoords(MainPinSize.RADIUS));
   };
 
-  // Функция заполнения поля адреса по местоположению главной метки на карте
-  var renderAddressInput = function (coords) {
-    window.adForm.address.value = coords.x + ', ' + coords.y;
+  var onMainPinMouseDown = function () {
+    mainPin.removeEventListener('keydown', onMainPinEnterPress);
+    mainPin.removeEventListener('mousedown', onMainPinMouseDown);
+    window.mainPin.onFirstClick();
   };
 
-  // Функция связанная с главной меткой вызывающаяся при деактивации страницы
-  var renderDeactivation = function () {
-    setPinStartPosition();
-    renderAddressInput(getMainPinCoords(window.const.MainPinSize.RADIUS));
-  };
-
-  // Функция связанная с главной меткой вызывающаяся при активации страницы
-  var renderActivation = function () {
-    renderAddressInput(getMainPinCoords(window.const.MainPinSize.HEIGHT));
+  var onMainPinEnterPress = function (evt) {
+    if (window.util.isEnterKey(evt)) {
+      window.mainPin.onFirstClick();
+    }
   };
 
   // Функция получения координат главной метки
@@ -66,19 +77,20 @@
       y: mainPin.offsetTop,
     };
 
+    window.mainPin.onMove(getMainPinCoords(MainPinSize.HEIGHT));
+
     var onMouseMove = function (moveEvt) {
       var x = startCoords.x + moveEvt.clientX - evt.clientX;
       var y = startCoords.y + moveEvt.clientY - evt.clientY;
 
       renderMainPinPos(getMainPinOffset(x, y));
-      renderActivation();
+      window.mainPin.onMove(getMainPinCoords(MainPinSize.HEIGHT));
     };
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
       document.removeEventListener('mousemove', onMouseMove);
-      renderActivation();
     };
 
     document.addEventListener('mousemove', onMouseMove);
@@ -86,8 +98,9 @@
   });
 
   window.mainPin = {
-    pin: mainPin,
-    renderActivation: renderActivation,
-    renderDeactivation: renderDeactivation,
+    reset: resetPin,
+    onFirstClick: window.util.noop,
+    onReset: window.util.noop,
+    onMove: window.util.noop,
   };
 })();
