@@ -76,13 +76,16 @@
 
   // Функция проверки соответствия количества гостей и количества комнат.
   var validateRoomAndGuest = function () {
-    if (roomNumber.value === '1' && guestNumber.value !== roomNumber.value) {
+    var rooms = +roomNumber.value;
+    var guests = +guestNumber.value;
+
+    if (rooms === 1 && rooms !== guests) {
       guestNumber.setCustomValidity('В однокомнатную квартиру разместить можно только 1 гостя');
-    } else if (roomNumber.value === '2' && (guestNumber.value === '0' || guestNumber.value > roomNumber.value)) {
+    } else if (rooms === 2 && (guests === 0 || guests > rooms)) {
       guestNumber.setCustomValidity('В 2х комнатную квартиру разместить можно только 1 или 2х гостей');
-    } else if (roomNumber.value === '3' && guestNumber.value === '0') {
+    } else if (rooms === 3 && guests === 0) {
       guestNumber.setCustomValidity('В 3х комнатную квартиру разместить можно только 1, 2х или 3х гостей');
-    } else if (roomNumber.value === '100' && !(guestNumber.value === '0')) {
+    } else if (rooms === 100 && guests !== 0) {
       guestNumber.setCustomValidity('В 100 комнатной квартире резмещать гостей нельзя');
     } else {
       guestNumber.setCustomValidity('');
