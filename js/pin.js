@@ -34,7 +34,7 @@
   var onDataLoad = function (ads) {
     if (ads.length > 0) {
       window.page.ads = ads.map(normalizeAds);
-      showPins(window.filter.update());
+      window.filter.update();
       window.filter.activate();
     }
   };

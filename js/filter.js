@@ -2,9 +2,9 @@
 
 (function () {
   var PIN_COUNT = 5;
-  var HousePrice  = {
+  var HousePrice = {
     MIN: 10000,
-    MAX: 50000
+    MAX: 50000,
   };
 
   var filterFields = window.domRef.filterForm.querySelectorAll('.map__filter, .map__checkbox');
@@ -14,17 +14,15 @@
   var housingGuests = window.domRef.filterForm.querySelector('#housing-guests');
   var housingFeatures = window.domRef.filterForm.querySelector('#housing-features');
 
-
-  var priceToValue = {
+  var priceToFilter = {
     low: function (price) {
       return price < HousePrice.MIN;
     },
-    middle: function (price) { 
-      return price >= HousePrice.MIN && 
-      price <= HousePrice.MAX; 
+    middle: function (price) {
+      return price >= HousePrice.MIN && price <= HousePrice.MAX;
     },
-    high: function (price) { 
-      return price > HousePrice.MAX; 
+    high: function (price) {
+      return price >= HousePrice.MAX;
     },
   };
 
@@ -40,67 +38,72 @@
 
   // Функция фильтрации по типу жилья
   var filterHousingType = function (ad) {
-    return housingType.value === 'any' || 
-    housingType.value === ad.offer.type;
+    return housingType.value === 'any'
+      || housingType.value === ad.offer.type;
   };
 
   // Функция фильтра по цене жилья
   var filterHousingPrice = function (ad) {
-    return housingPrice.value === 'any' || 
-    priceToValue[housingPrice.value](ad.offer.price);
+    return housingPrice.value === 'any'
+      || priceToFilter[housingPrice.value](ad.offer.price);
   };
 
   // Функция фильтра по количеству комнат
   var filterHousingRooms = function (ad) {
-    return housingRooms.value === 'any' || 
-    +housingRooms.value === ad.offer.rooms;
+    return housingRooms.value === 'any'
+      || +housingRooms.value === ad.offer.rooms;
   };
 
   // Функция фильтра по количеству гостей
   var filterHousingGuests = function (ad) {
-    return housingGuests.value === 'any' || 
-    +housingGuests.value === ad.offer.guests;
+    return housingGuests.value === 'any'
+      || +housingGuests.value === ad.offer.guests;
   };
-  
-  var checkedFeatures = housingFeatures.querySelectorAll('input[type=checkbox]:checked');
+
   var filterEvery = Array.prototype.every;
+  var checkedFeatures = housingFeatures.querySelectorAll('input[type=checkbox]:checked');
 
   var filterHousingFeatures = function (ad) {
     return filterEvery.call(checkedFeatures, function (feature) {
-      return ad.offer.features.indexOf(feature) !== -1;
+      return ad.offer.features.indexOf(feature.value) > -1;
     });
   };
 
   // Функция коллбэк фильтрации элементов массива
-  var filterAds = function (ad) {
-    return filterHousingType(ad) &&
-    filterHousingPrice(ad) &&
-    filterHousingRooms(ad) &&
-    filterHousingGuests(ad) &&
-    filterHousingFeatures(ad);
+  var filterAd = function (ad) {
+    return filterHousingType(ad)
+      && filterHousingPrice(ad)
+      && filterHousingRooms(ad)
+      && filterHousingGuests(ad)
+      && filterHousingFeatures(ad);
   };
 
   // Функция фильтрации элементов массива
   var getFilteredAds = function () {
     checkedFeatures = housingFeatures.querySelectorAll('input[type=checkbox]:checked');
     return window.page.ads
-    .filter(filterAds)
-    .slice(0, PIN_COUNT);
+      .filter(filterAd)
+      .slice(0, PIN_COUNT);
   };
 
-  // Обработчик, закрывает объявления, убирает пины и создает новые на основе требований фильтра
-  var onFilterChange = window.debounce(function (ad) {
-    window.card.close();
+  var updateFilter = function () {
     window.pin.remove();
-    window.pin.show(getFilteredAds(ad));
-  });
+    window.pin.show(getFilteredAds());
+  };
+
+  var onFilterChange = function () {
+    window.card.close();
+    updateFilter();
+  };
+
+  var onDebouncedFilterChange = window.debounce(onFilterChange);
 
   // Обработчик события изменения значения фильтров
-  window.domRef.filterForm.addEventListener('change', onFilterChange);
+  window.domRef.filterForm.addEventListener('change', onDebouncedFilterChange);
 
   window.filter = {
     deactivate: deactivateFilters,
     activate: activateFilters,
-    update: getFilteredAds,
+    update: updateFilter,
   };
 })();
