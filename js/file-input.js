@@ -1,4 +1,3 @@
-// Файл avatar.js
 'use strict';
 
 (function () {

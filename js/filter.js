@@ -13,6 +13,7 @@
   var housingRooms = window.domRef.filterForm.querySelector('#housing-rooms');
   var housingGuests = window.domRef.filterForm.querySelector('#housing-guests');
   var housingFeatures = window.domRef.filterForm.querySelector('#housing-features');
+  var checkedFeatures = housingFeatures.querySelectorAll('input[type=checkbox]:checked');
 
   var priceToFilter = {
     low: function (price) {
@@ -60,8 +61,8 @@
       || +housingGuests.value === ad.offer.guests;
   };
 
+  // Функция фильтра по наличию удобств
   var filterEvery = Array.prototype.every;
-  var checkedFeatures = housingFeatures.querySelectorAll('input[type=checkbox]:checked');
 
   var filterHousingFeatures = function (ad) {
     return filterEvery.call(checkedFeatures, function (feature) {

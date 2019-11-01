@@ -128,7 +128,6 @@
     validateRoomAndGuest();
   });
 
-
   // функция успешной отправки формы
   var onDataSaveSuccess = function () {
     window.message.showSuccess();
