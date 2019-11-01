@@ -8,6 +8,7 @@
     var pinImage = pin.querySelector('img');
 
     pinImage.src = ad.author.avatar;
+    pinImage.alt = ad.offer.title;
     pin.style.left = (ad.location.x - window.const.PinSize.RADIUS) + 'px';
     pin.style.top = (ad.location.y - window.const.PinSize.HEIGHT) + 'px';
     pin.dataset.id = ad.id;
