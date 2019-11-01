@@ -42,22 +42,35 @@
     mainPin.style.top = coords.y + 'px';
   };
 
-  var resetPin = function () {
-    renderMainPinPos(initialCoords);
+  var addMainPinListeners = function () {
     mainPin.addEventListener('keydown', onMainPinEnterPress);
     mainPin.addEventListener('mousedown', onMainPinMouseDown);
+  };
+
+  var removeMainPinListeners = function () {
+    mainPin.removeEventListener('keydown', onMainPinEnterPress);
+    mainPin.removeEventListener('mousedown', onMainPinMouseDown);
+  };
+
+  var resetMainPin = function () {
+    renderMainPinPos(initialCoords);
+    addMainPinListeners();
     window.mainPin.onReset(getMainPinCoords(MainPinSize.RADIUS));
   };
 
-  var onMainPinMouseDown = function () {
-    mainPin.removeEventListener('keydown', onMainPinEnterPress);
-    mainPin.removeEventListener('mousedown', onMainPinMouseDown);
+  var initFirstClick = function () {
+    removeMainPinListeners();
+    window.mainPin.onReset(getMainPinCoords(MainPinSize.HEIGHT));
     window.mainPin.onFirstClick();
+  };
+
+  var onMainPinMouseDown = function () {
+    initFirstClick();
   };
 
   var onMainPinEnterPress = function (evt) {
     if (window.util.isEnterKey(evt)) {
-      window.mainPin.onFirstClick();
+      initFirstClick();
     }
   };
 
@@ -98,7 +111,7 @@
   });
 
   window.mainPin = {
-    reset: resetPin,
+    reset: resetMainPin,
     onFirstClick: window.util.noop,
     onReset: window.util.noop,
     onMove: window.util.noop,
